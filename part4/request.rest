@@ -19,7 +19,7 @@ PUT http://localhost:3001/api/blog/67278f294e8cd44817e15221
 content-type: application/json
 
 {
-    "title": "blog1 - new",
+    "title": "blog2",
     "author": "Fang",
     "url":"123",
     "likes":5
