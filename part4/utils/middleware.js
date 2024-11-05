@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 const logger = require('./logger')
 
 const requestLogger = (request, response, next) => {
@@ -12,17 +14,50 @@ const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
 
-const getTokenFrom = (request, response, next) => {
-    const authorization = request.get('authorization')
+const tokenExtractor = async (request, response, next) => {
+    // if (!request.token) {
+    //     return response.status(401).json({ error: 'token missing or invalid' })
+    // }
+    // const decodedToken = jwt.verify(request.token, process.env.SECRET);
+    // if (!decodedToken.id) {
+    //     return response.status(401).json({ error: 'token invalid' });
+    // }
+    // const user = await User.findById(decodedToken.id);
+    // if (!user) {
+    //     return response.status(401).json({ error: 'user not found' });
+    // }
+    const authorization = request.get('authorization');
     if (authorization && authorization.startsWith('Bearer ')) {
-        request.token = authorization.replace('Bearer ', '')
-        console.log("Extracted Token:", request.token);  // Log the extracted token
-
-    } else {
-        console.log("Authorization header missing or does not start with Bearer");
-
+        request.token = authorization.replace('Bearer ', '');
     }
     next()
+}
+
+const userExtractor = async (request, response, next) => {
+    console.log("Entering userExtractor middleware"); // First log
+
+    if (!request.token) {
+        console.log("No token found");  // Log missing token
+
+        return response.status(401).json({ error: 'token missing or invalid' })
+
+    }
+    const decodedToken = jwt.verify(request.token, process.env.SECRET);
+    console.log("Decoded Token:", decodedToken);  // Log the decoded token
+
+    if (!decodedToken.id) {
+        return response.status(401).json({ error: 'token invalid' });
+    }
+
+    const user = await User.findById(decodedToken.id);
+    if (!user) {
+        console.log("User not found");
+
+        return response.status(401).json({ error: 'user not found' });
+    }
+
+    request.user = user;  // Attach user to request object
+    next();
 }
 
 const errorHandler = (error, request, response, next) => {
@@ -50,5 +85,6 @@ module.exports = {
     requestLogger,
     unknownEndpoint,
     errorHandler,
-    getTokenFrom
+    tokenExtractor,
+    userExtractor
 }

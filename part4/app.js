@@ -23,13 +23,19 @@ mongoose.connect(config.MONGODB_URI)
     })
 // app.use(cors())
 app.use(express.static('dist'))
+
 app.use(express.json())
 app.use(middleware.requestLogger)
-app.use(middleware.getTokenFrom)
+app.use(middleware.tokenExtractor);
+//app.use(middleware.userExtractor);
 
-app.use('/api/blog', blogRouter)
+app.use('/api/blog', middleware.userExtractor, blogRouter)
+
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+
+console.log("Finished setting up routes");
+
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 
