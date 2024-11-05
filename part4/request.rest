@@ -3,15 +3,17 @@ GET http://localhost:3001/api/blog
 ###
 POST http://localhost:3001/api/blog
 content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY3MmEyNjRiZmI3NGY5MzU1NjZjZDY4MCIsImlhdCI6MTczMDgyMTY5NSwiZXhwIjoxNzMwODI1Mjk1fQ.bTfJxaBllggAO_TS0IFOZbZxjidxYaB9f2H_NzqsiSA
 
 {
-    "title": "Hi Herizon",
+    "title": "Hi Herizon 2",
     "author": "User_Fang",
     "url":"123",
     "likes":5,
-    "userId":"672a27e692e8e51a1bbd22ba"
+    "userId":"672a278792e8e51a1bbd22b1"
 }
 
+# 
 ###
 DELETE http://localhost:3001/api/blog/67278f294e8cd44817e15221
 
@@ -45,7 +47,17 @@ POST http://localhost:3001/api/users
 content-type: application/json
 
 {
-    "username": "user_fang",
+    "username": "user_fang_11",
     "name": "user_fang",
-    "password": "123456"
+    "password": "1"
+}
+
+### 
+#Login
+POST http://localhost:3001/api/login
+content-type: application/json
+
+{
+    "username": "root",
+    "password": "salainen"
 }
