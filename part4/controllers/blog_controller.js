@@ -2,23 +2,35 @@ const blogRouter = require('express').Router();
 const Blog = require('../models/blog');
 
 // GET all blogs
-blogRouter.get('/', (request, response, next) => {
-    Blog.find({})
-        .then(blogs => response.json(blogs))
-        .catch(error => next(error));
+blogRouter.get('/', async (request, response) => {
+
+    const blogs = await Blog.find({});
+    response.json(blogs);
+
+});
+// Add this route in blogRouter if not present
+blogRouter.get('/:id', async (request, response, next) => {
+
+    const blog = await Blog.findById(request.params.id);
+    if (blog) {
+        response.json(blog);
+    } else {
+        response.status(404).end();
+    }
+
 });
 
+
 // DELETE a blog by ID
-blogRouter.delete('/:id', (request, response, next) => {
-    Blog.findByIdAndDelete(request.params.id)
-        .then(() => {
-            response.status(204).end();
-        })
-        .catch(error => next(error));
+blogRouter.delete('/:id', async (request, response) => {
+
+    await Blog.findByIdAndDelete(request.params.id)
+    response.status(204).end()
+
 });
 
 // POST a new blog
-blogRouter.post('/', (request, response, next) => {
+blogRouter.post('/', async (request, response, next) => {
     const body = request.body;
 
     if (!body.title || !body.author || !body.url || !body.likes) {
@@ -29,14 +41,13 @@ blogRouter.post('/', (request, response, next) => {
         title: body.title,
         author: body.author,
         url: body.url,
-        likes: body.likes
+        likes: body.likes || 0
     });
 
-    blog.save()
-        .then(savedBlog => {
-            response.status(201).json(savedBlog);
-        })
-        .catch(error => next(error));
+
+    const savedBlog = await blog.save()
+    response.status(201).json(savedBlog)
+
 });
 
 // PUT to update a blog by ID
@@ -51,7 +62,7 @@ blogRouter.put('/:id', (request, response, next) => {
         title: body.title,
         author: body.author,
         url: body.url,
-        likes: body.likes
+        likes: body.likes || 0
     };
 
     Blog.findByIdAndUpdate(request.params.id, blog, {
