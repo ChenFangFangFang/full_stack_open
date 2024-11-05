@@ -5,10 +5,11 @@ POST http://localhost:3001/api/blog
 content-type: application/json
 
 {
-    "title": "blog1",
-    "author": "Fang",
+    "title": "Hi Herizon",
+    "author": "User_Fang",
     "url":"123",
-    "likes":5
+    "likes":5,
+    "userId":"672a27e692e8e51a1bbd22ba"
 }
 
 ###
@@ -23,4 +24,28 @@ content-type: application/json
     "author": "Fang",
     "url":"123",
     "likes":50
+}
+
+###
+# USER
+GET http://localhost:3001/api/users
+
+###
+POST http://localhost:3001/api/users
+content-type: application/json
+
+{
+    "username": "root",
+    "name": "Superuser",
+    "password": "salainen"
+}
+
+###
+POST http://localhost:3001/api/users
+content-type: application/json
+
+{
+    "username": "user_fang",
+    "name": "user_fang",
+    "password": "123456"
 }
