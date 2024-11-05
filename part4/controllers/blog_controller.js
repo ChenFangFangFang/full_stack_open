@@ -8,7 +8,6 @@ blogRouter.get('/', async (request, response) => {
     response.json(blogs);
 
 });
-// Add this route in blogRouter if not present
 blogRouter.get('/:id', async (request, response, next) => {
 
     const blog = await Blog.findById(request.params.id);
@@ -52,20 +51,14 @@ blogRouter.post('/', async (request, response, next) => {
 
 // PUT to update a blog by ID
 blogRouter.put('/:id', (request, response, next) => {
-    const body = request.body;
+    const { likes } = request.body;
 
-    if (!body.title || !body.author || !body.url || !body.likes) {
-        return response.status(400).json({ error: 'content missing' });
+    if (likes === undefined) {
+        return response.status(400).json({ error: 'likes filed is missing' })
     }
 
-    const blog = {
-        title: body.title,
-        author: body.author,
-        url: body.url,
-        likes: body.likes || 0
-    };
 
-    Blog.findByIdAndUpdate(request.params.id, blog, {
+    Blog.findByIdAndUpdate(request.params.id, { $set: { likes } }, {
         new: true,
         runValidators: true,
         context: 'query'

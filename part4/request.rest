@@ -15,12 +15,12 @@ content-type: application/json
 DELETE http://localhost:3001/api/blog/67278f294e8cd44817e15221
 
 ###
-PUT http://localhost:3001/api/blog/67278f294e8cd44817e15221
+PUT http://localhost:3001/api/blog/6728eb662b3ed8bbe065e826
 content-type: application/json
 
 {
     "title": "blog2",
     "author": "Fang",
     "url":"123",
-    "likes":5
+    "likes":50
 }
