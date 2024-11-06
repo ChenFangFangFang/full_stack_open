@@ -8,6 +8,12 @@ loginRouter.post('/', async (request, response) => {
 
     //search the user in the DB
     const user = await User.findOne({ username })
+    try {
+        await bcrypt.compare(password, user.passwordHash)
+    } catch (error) {
+        console.log('error:', error)
+    }
+
     //check the PW
     const passwordCorrect = user === null
         ? false
@@ -30,7 +36,7 @@ loginRouter.post('/', async (request, response) => {
     const token = jwt.sign(
         userForToken,
         process.env.SECRET,
-        { expiresIn: 60 * 60 }
+        // { expiresIn: 60 * 60 }
     )
     response
         .status(200)

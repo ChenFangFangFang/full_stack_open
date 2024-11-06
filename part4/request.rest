@@ -1,29 +1,28 @@
 ###
 GET http://localhost:3001/api/blog
-content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY3MmEyNjRiZmI3NGY5MzU1NjZjZDY4MCIsImlhdCI6MTczMDg5OTg1OCwiZXhwIjoxNzMwOTAzNDU4fQ.AghuUTpBBF_N6_i9S_eiAAVi2Xe5LKPlMVb1Dt-pUnM
-
+# content-type: application/json
+# Authorization: Bearer 
 ###
 POST http://localhost:3001/api/blog
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY3MmEyNjRiZmI3NGY5MzU1NjZjZDY4MCIsImlhdCI6MTczMDg5OTc1MiwiZXhwIjoxNzMwOTAzMzUyfQ.OLAdIsN6U4IWgrtELwlHm-iQJjCD4t8vP__RZDo-Wdo
+Authorization: Bearer 
 
 {
-    "title": "Hi Herizon 44",
+    "title": "Hi Herizon 5",
     "author": "User_Fang",
     "url":"123",
-    "likes":5
-}
+    "likes":5}
 
 # 
 ###
-DELETE http://localhost:3001/api/blog/672a278792e8e51a1bbd22b1
+DELETE http://localhost:3001/api/blog/672a68e1a64bcc9b4306ecd6
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY3MmEyNjRiZmI3NGY5MzU1NjZjZDY4MCIsImlhdCI6MTczMDgzMTc4NSwiZXhwIjoxNzMwODM1Mzg1fQ.W8pJdqflrGkm_RVkVpeKn-_Qlb6j3SFWkLOPsx_GK9k
+Authorization: Bearer 
 
 ###
 PUT http://localhost:3001/api/blog/6728eb662b3ed8bbe065e826
 content-type: application/json
+Authorization: Bearer 
 
 {
     "title": "blog2",
