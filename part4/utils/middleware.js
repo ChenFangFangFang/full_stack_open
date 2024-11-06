@@ -14,35 +14,26 @@ const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
 
-const tokenExtractor = async (request, response, next) => {
-    // if (!request.token) {
-    //     return response.status(401).json({ error: 'token missing or invalid' })
-    // }
-    // const decodedToken = jwt.verify(request.token, process.env.SECRET);
-    // if (!decodedToken.id) {
-    //     return response.status(401).json({ error: 'token invalid' });
-    // }
-    // const user = await User.findById(decodedToken.id);
-    // if (!user) {
-    //     return response.status(401).json({ error: 'user not found' });
-    // }
-    const authorization = request.get('authorization');
+const getTokenFrom = request => {
+    const authorization = request.get('authorization')
     if (authorization && authorization.startsWith('Bearer ')) {
-        request.token = authorization.replace('Bearer ', '');
+        return authorization.replace('Bearer ', '')
     }
-    next()
+    return null
 }
+
 
 const userExtractor = async (request, response, next) => {
     console.log("Entering userExtractor middleware"); // First log
+    const token = getTokenFrom(request)
 
-    if (!request.token) {
+    if (!token) {
         console.log("No token found");  // Log missing token
 
         return response.status(401).json({ error: 'token missing or invalid' })
 
     }
-    const decodedToken = jwt.verify(request.token, process.env.SECRET);
+    const decodedToken = jwt.verify(token, process.env.SECRET);
     console.log("Decoded Token:", decodedToken);  // Log the decoded token
 
     if (!decodedToken.id) {
@@ -85,6 +76,5 @@ module.exports = {
     requestLogger,
     unknownEndpoint,
     errorHandler,
-    tokenExtractor,
     userExtractor
 }
