@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Notification from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([]) // changed to an array to hold multiple blogs
@@ -9,25 +10,41 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [notificationType, setNotificationType] = useState(null);
 
   useEffect(() => {
-    blogService.getAll().then(initialBlogs => setBlogs(initialBlogs))
-  }, [])
+    const loggedUserJson = window.localStorage.getItem('loddedBlogappUser')
+    if (loggedUserJson) {
+      const user = JSON.parse(loggedUserJson)
+      setUser(user)
+      blogService.setToken(user.token)
+    }
 
+  }, [])
+  useEffect(() => {
+    blogService.getAll().then(initialBlogs => setBlogs(initialBlogs))
+  })
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
       const user = await loginService.login({
         username, password
       })
+      window.localStorage.setItem(
+        'loddedBlogappUser', JSON.stringify(user)
+      )
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage("Wrong credentials")
-      setTimeout(() => setErrorMessage(null), 5000)
+      setNotificationMessage('Wrong username or password');
+      setNotificationType('delete');
+      setTimeout(() => {
+        setNotificationMessage(null);
+        setNotificationType(null);
+      }, 5000);
     }
   }
 
@@ -41,11 +58,18 @@ const App = () => {
     event.preventDefault()
     try {
       const addedBlog = await blogService.create(newBlog)
+      setNotificationMessage(`A new blog ${newBlog.title} added`);
+      setNotificationType('success');
+      setTimeout(() => {
+        setNotificationMessage(null);
+        setNotificationType(null);
+      }, 5000);
       setBlogs(blogs.concat(addedBlog)) // Update the blogs list with the new blog
       setNewBlog({ title: "", author: "", url: "" }) // Clear the form fields
     } catch (exception) {
-      setErrorMessage("Failed to add blog")
-      setTimeout(() => setErrorMessage(null), 5000)
+      setNotificationMessage("Failed to add blog")
+      setNotificationType('delete');
+      setTimeout(() => setNotificationMessage(null), 5000)
     }
   }
 
@@ -96,12 +120,14 @@ const App = () => {
           onChange={event => setNewBlog({ ...newBlog, url: event.target.value })}
         />
       </div>
-      <button type="submit">Save</button>
+      <button type="submit">Create</button>
     </form>
   )
 
   return (
     <div>
+      <Notification message={notificationMessage} type={notificationType} />
+
       {user === null ?
         loginForm() :
         <div>
