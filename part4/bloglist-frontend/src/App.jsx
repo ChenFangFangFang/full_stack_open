@@ -4,17 +4,15 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-  const [blog, setBlogs] = useState({ title: "", author: "", url: "", likes: "" })
-  const [newBlog, setNewBlog] = useState([])
+  const [blogs, setBlogs] = useState([]) // changed to an array to hold multiple blogs
+  const [newBlog, setNewBlog] = useState({ title: "", author: "", url: "" })
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
+    blogService.getAll().then(initialBlogs => setBlogs(initialBlogs))
   }, [])
 
   const handleLogin = async (event) => {
@@ -25,13 +23,11 @@ const App = () => {
       })
       blogService.setToken(user.token)
       setUser(user)
-      setUsername(username)
-      setPassword(password)
+      setUsername('')
+      setPassword('')
     } catch (exception) {
       setErrorMessage("Wrong credentials")
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      setTimeout(() => setErrorMessage(null), 5000)
     }
   }
 
@@ -41,6 +37,17 @@ const App = () => {
     setPassword('')
   }
 
+  const addBlog = async (event) => {
+    event.preventDefault()
+    try {
+      const addedBlog = await blogService.create(newBlog)
+      setBlogs(blogs.concat(addedBlog)) // Update the blogs list with the new blog
+      setNewBlog({ title: "", author: "", url: "" }) // Clear the form fields
+    } catch (exception) {
+      setErrorMessage("Failed to add blog")
+      setTimeout(() => setErrorMessage(null), 5000)
+    }
+  }
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
@@ -63,37 +70,51 @@ const App = () => {
         />
       </div>
       <button type="submit">login</button>
-
     </form>
   )
 
-  const blogForm = () => {
+  const blogForm = () => (
     <form onSubmit={addBlog}>
-      <input
-        value={newBlog}
-        onChange={handleBlogChange} />
+      <div>
+        Title:
+        <input
+          value={newBlog.title}
+          onChange={event => setNewBlog({ ...newBlog, title: event.target.value })}
+        />
+      </div>
+      <div>
+        Author:
+        <input
+          value={newBlog.author}
+          onChange={event => setNewBlog({ ...newBlog, author: event.target.value })}
+        />
+      </div>
+      <div>
+        Url:
+        <input
+          value={newBlog.url}
+          onChange={event => setNewBlog({ ...newBlog, url: event.target.value })}
+        />
+      </div>
       <button type="submit">Save</button>
     </form>
-  }
+  )
+
   return (
     <div>
-
-
       {user === null ?
         loginForm() :
         <div>
           <p>{user.name} logged-in</p>
-          <button onClick={handleLogout} >Logout</button>
-
+          <button onClick={handleLogout}>Logout</button>
+          <h2>Add a new blog</h2>
+          {blogForm()}
           <h2>blogs</h2>
-          {blog.map(blog =>
+          {blogs.map(blog =>
             <Blog key={blog.id} blog={blog} />
           )}
         </div>
       }
-
-
-
     </div>
   )
 }
