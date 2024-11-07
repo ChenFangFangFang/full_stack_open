@@ -35,6 +35,11 @@ const App = () => {
     }
   }
 
+  const handleLogout = () => {
+    setUser(null)
+    setUsername('')
+    setPassword('')
+  }
 
 
   const loginForm = () => (
@@ -78,6 +83,7 @@ const App = () => {
         loginForm() :
         <div>
           <p>{user.name} logged-in</p>
+          <button onClick={handleLogout} >Logout</button>
 
           <h2>blogs</h2>
           {blog.map(blog =>
