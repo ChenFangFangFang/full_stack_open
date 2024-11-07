@@ -1,11 +1,11 @@
 import blogService from '../services/blogs'
 
-
-const AddBlog = ({ blogs, setBlogs, newBlog, setNewBlog, setNotificationMessage, setNotificationType }) => {
+const AddBlog = ({ blogs, setBlogs, newBlog, setNewBlog, setNotificationMessage, setNotificationType, toggleVisibility }) => {
     const addBlog = async (event) => {
         event.preventDefault()
         try {
             const addedBlog = await blogService.create(newBlog)
+            console.log('Added blog:', addedBlog) // Check what is returned
             setNotificationMessage(`A new blog ${newBlog.title} added`);
             setNotificationType('success');
             setTimeout(() => {
@@ -13,8 +13,10 @@ const AddBlog = ({ blogs, setBlogs, newBlog, setNewBlog, setNotificationMessage,
                 setNotificationType(null);
             }, 5000);
             setBlogs(blogs.concat(addedBlog)) // Update the blogs list with the new blog
-            setNewBlog({ title: "", author: "", url: "" }) // Clear the form fields
+            setNewBlog({ title: "", author: "", url: "" })
+            toggleVisibility() // Clear the form fields
         } catch (exception) {
+            console.log(exception)
             setNotificationMessage("Failed to add blog")
             setNotificationType('delete');
             setTimeout(() => setNotificationMessage(null), 5000)

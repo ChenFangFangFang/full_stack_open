@@ -4,6 +4,7 @@ import blogService from './services/blogs'
 import Notification from './components/Notification'
 import AddBlog from './components/AddBlog'
 import Login from './components/Login'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([]) // changed to an array to hold multiple blogs
@@ -43,14 +44,19 @@ const App = () => {
         <div>
           <p>{user.name} logged-in</p>
           <button onClick={handleLogout}>Logout</button>
-          <AddBlog
-            blogs={blogs}
-            setBlogs={setBlogs}
-            newBlog={newBlog}
-            setNewBlog={setNewBlog}
-            setNotificationMessage={setNotificationMessage}
-            setNotificationType={setNotificationType}
-          />
+          <Togglable buttonLabel="add a new blog">
+            {(toggleVisibility) => (
+              <AddBlog
+                blogs={blogs}
+                setBlogs={setBlogs}
+                newBlog={newBlog}
+                setNewBlog={setNewBlog}
+                setNotificationMessage={setNotificationMessage}
+                setNotificationType={setNotificationType}
+                toggleVisibility={toggleVisibility}
+              />
+            )}
+          </Togglable>
           <h2>blogs</h2>
           {blogs.map(blog =>
             <Blog key={blog.id} blog={blog} />

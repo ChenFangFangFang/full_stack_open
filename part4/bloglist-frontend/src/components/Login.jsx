@@ -1,8 +1,16 @@
 import loginService from "../services/login"
 import blogService from '../services/blogs'
+import { useEffect } from 'react'
 
 const Login = ({ username, password, setUser, setUsername, setPassword, setNotificationMessage, setNotificationType, }) => {
-
+    useEffect(() => {
+        const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+        if (loggedUserJSON) {
+            const user = JSON.parse(loggedUserJSON)
+            setUser(user)
+            blogService.setToken(user.token)
+        }
+    }, [])
     const handleLogin = async (event) => {
         event.preventDefault()
         try {
@@ -10,7 +18,7 @@ const Login = ({ username, password, setUser, setUsername, setPassword, setNotif
                 username, password
             })
             window.localStorage.setItem(
-                'loddedBlogappUser', JSON.stringify(user)
+                'loggedBlogappUser', JSON.stringify(user)
             )
             blogService.setToken(user.token)
             setUser(user)
