@@ -15,17 +15,46 @@ const App = () => {
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationType, setNotificationType] = useState(null);
 
-  useEffect(() => {
-    blogService.getAll().then(initialBlogs =>
-      setBlogs(initialBlogs))
-  }, [])
+  // useEffect(() => {
+  //   blogService.getAll().then(initialBlogs =>
+  //     setBlogs(initialBlogs))
+  // }, [])
 
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user) // Set user object in state
+      blogService.setToken(user.token) // Set the token for authenticated requests
+    }
+
+    // Fetch initial blogs
+    blogService.getAll().then(initialBlogs => setBlogs(initialBlogs))
+  }, [])
 
   const handleLogout = () => {
     setUser(null)
     setUsername('')
     setPassword('')
+    window.localStorage.removeItem('loggedBlogappUser') // Clear user data from local storage
+
   }
+  const handleAddLike = async (blog) => {
+    const blogId = blog.id
+    const updatedBlog = {
+      ...blog,
+      likes: blog.likes + 1,
+      user: blog.user ? blog.user.id : undefined  // Ensure user ID is sent, not the entire user object
+
+    }
+    const response = await blogService.update(blogId, updatedBlog)
+    console.log('Updated Blog:', response)
+    setBlogs(blogs.map(b => (b.id !== blog.id ? b : response)))
+
+
+  }
+
+
 
   return (
     <div>
@@ -60,7 +89,7 @@ const App = () => {
           <h2>Blogs</h2>
 
           {blogs.map(blog => (
-            (<Blog key={blog.id} blog={blog} />
+            (<Blog key={blog.id} blog={blog} handleAddLike={handleAddLike} />
             )
           ))}
 
