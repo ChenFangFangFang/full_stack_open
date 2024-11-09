@@ -15,63 +15,52 @@ const App = () => {
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationType, setNotificationType] = useState(null)
 
+  // useEffect(() => {
+  //   blogService.getAll().then(initialBlogs =>
+  //     setBlogs(initialBlogs))
+  // }, [])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
+      setUser(user) // Set user object in state
+      blogService.setToken(user.token) // Set the token for authenticated requests
     }
 
-    // 初次挂载时加载博客列表
-    blogService.getAll().then((initialBlogs) => setBlogs(initialBlogs))
-  }, []) // 空依赖数组，确保仅在初次挂载时执行
-
+    // Fetch initial blogs
+    blogService.getAll().then(initialBlogs => setBlogs(initialBlogs))
+  }, [])
 
   const handleLogout = () => {
     setUser(null)
     setUsername('')
     setPassword('')
     window.localStorage.removeItem('loggedBlogappUser') // Clear user data from local storage
+
   }
-  const handleDelete = async (blog) => {
-    if (window.confirm(`Do you really want to delete "${blog.title}"?`)) {
-      try {
-        await blogService.deleteBlog(blog.id) // 发送删除请求
-
-        // 重新获取博客列表，以确保状态同步
-        setBlogs(blogs.filter(b => b.id !== blog.id))
-
-        setNotificationMessage(`Deleted blog: ${blog.title}`)
-        setNotificationType('success')
-        setTimeout(() => setNotificationMessage(null), 5000)
-      } catch (error) {
-        console.error('Failed to delete blog:', error.response?.data || error)
-        setNotificationMessage('Failed to delete blog')
-        setNotificationType('error')
-        setTimeout(() => setNotificationMessage(null), 5000)
-      }
-    }
-  }
-
   const handleAddLike = async (blog) => {
     const blogId = blog.id
     const updatedBlog = {
       ...blog,
       likes: blog.likes + 1,
-      user: blog.user ? blog.user.id : undefined, // Ensure user ID is sent, not the entire user object
+      user: blog.user ? blog.user.id : undefined  // Ensure user ID is sent, not the entire user object
+
     }
     const response = await blogService.update(blogId, updatedBlog)
     console.log('Updated Blog:', response)
-    setBlogs(blogs.map((b) => (b.id !== blog.id ? b : response)))
+    setBlogs(blogs.map(b => (b.id !== blog.id ? b : response)))
+
+
   }
+
+
 
   return (
     <div>
       <Notification message={notificationMessage} type={notificationType} />
 
-      {user === null ? (
+      {user === null ?
         <Login
           username={username}
           password={password}
@@ -80,8 +69,7 @@ const App = () => {
           setPassword={setPassword}
           setNotificationMessage={setNotificationMessage}
           setNotificationType={setNotificationType}
-        />
-      ) : (
+        /> :
         <div>
           <p>{user.name} logged-in</p>
           <button onClick={handleLogout}>Logout</button>
@@ -101,18 +89,22 @@ const App = () => {
           <h2>Blogs</h2>
 
           {blogs
-            .slice() // Make a copy of blogs to avoid mutation
+            .slice() // Copy to avoid mutation
             .sort((a, b) => b.likes - a.likes) // Sort by likes, descending
             .map((blog) => (
               <Blog
-                key={blog.id}
+                key={blog.id} // Unique key for each Blog component
                 blog={blog}
                 handleAddLike={handleAddLike}
-                handleDelete={() => handleDelete(blog)}
+                // handleDelete={() => handleDelete(blog)}
               />
             ))}
+
+
+
+
         </div>
-      )}
+      }
     </div>
   )
 }
