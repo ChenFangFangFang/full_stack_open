@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
+
 const Togglable = ({ openLabel, closeLabel, children }) => {
   const [visible, setVisible] = useState(false)
 
@@ -16,16 +17,17 @@ const Togglable = ({ openLabel, closeLabel, children }) => {
         <button onClick={toggleVisibility}>{openLabel}</button>
       </div>
       <div style={showWhenVisible}>
-        {children(toggleVisibility)}
+        {typeof children === 'function' ? children(toggleVisibility) : children}
         <button onClick={toggleVisibility}>{closeLabel}</button>
       </div>
     </div>
   )
 }
+
 Togglable.propTypes = {
-  openLabel: PropTypes.string.isRequired, // openLabel must be a string and required
-  closeLabel: PropTypes.string.isRequired, // closeLabel must be a string and required
-  children: PropTypes.func.isRequired // children must be a function and required
+  openLabel: PropTypes.string.isRequired,
+  closeLabel: PropTypes.string.isRequired,
+  children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
 }
 
 export default Togglable

@@ -7,7 +7,7 @@ import Login from './components/Login'
 import Togglable from './components/Togglable'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]) // changed to an array to hold multiple blogs
+  const [blogs, setBlogs] = useState([])
   const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '' })
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -15,52 +15,89 @@ const App = () => {
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationType, setNotificationType] = useState(null)
 
-  // useEffect(() => {
-  //   blogService.getAll().then(initialBlogs =>
-  //     setBlogs(initialBlogs))
-  // }, [])
-
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user) // Set user object in state
-      blogService.setToken(user.token) // Set the token for authenticated requests
+    const fetchInitialData = async () => {
+      // Check for logged in user
+      const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+      if (loggedUserJSON) {
+        const user = JSON.parse(loggedUserJSON)
+        setUser(user)
+        blogService.setToken(user.token)
+      }
+
+      // Fetch blogs
+      try {
+        const initialBlogs = await blogService.getAll()
+        setBlogs(initialBlogs)
+      } catch (error) {
+        setNotificationMessage('Failed to fetch blogs')
+        setNotificationType('error')
+        setTimeout(() => setNotificationMessage(null), 5000)
+      }
     }
 
-    // Fetch initial blogs
-    blogService.getAll().then(initialBlogs => setBlogs(initialBlogs))
+    fetchInitialData()
   }, [])
 
   const handleLogout = () => {
     setUser(null)
     setUsername('')
     setPassword('')
-    window.localStorage.removeItem('loggedBlogappUser') // Clear user data from local storage
-
+    window.localStorage.removeItem('loggedBlogappUser')
+    blogService.setToken(null) // Clear the token
   }
+
   const handleAddLike = async (blog) => {
-    const blogId = blog.id
-    const updatedBlog = {
-      ...blog,
-      likes: blog.likes + 1,
-      user: blog.user ? blog.user.id : undefined  // Ensure user ID is sent, not the entire user object
-
+    try {
+      const updatedBlog = {
+        ...blog,
+        likes: blog.likes + 1,
+        user: blog.user?.id // Use optional chaining
+      }
+      const response = await blogService.update(blog.id, updatedBlog)
+      setBlogs(blogs.map(b => (b.id !== blog.id ? b : response)))
+    } catch (error) {
+      setNotificationMessage('Failed to update likes')
+      setNotificationType('error')
+      setTimeout(() => setNotificationMessage(null), 5000)
     }
-    const response = await blogService.update(blogId, updatedBlog)
-    console.log('Updated Blog:', response)
-    setBlogs(blogs.map(b => (b.id !== blog.id ? b : response)))
-
-
   }
 
+  const handleDelete = async (blog) => {
+    if (!window.confirm(`Do you really want to delete "${blog.title}"?`)) {
+      return
+    }
 
+    try {
+      const deleted = await blogService.deleteBlog(blog.id)
+      if (deleted) {
+        // Update the local state to remove the deleted blog
+        setBlogs(prevBlogs => prevBlogs.filter(b => b.id !== blog.id))
+        setNotificationMessage(`Successfully deleted blog: ${blog.title}`)
+        setNotificationType('success')
+      } else {
+        throw new Error('Failed to delete blog')
+      }
+    } catch (error) {
+      console.error('Delete error:', error)
+      setNotificationMessage(
+        `Failed to delete blog: ${error.response?.data?.error || error.message}`
+      )
+      setNotificationType('error')
+    } finally {
+      // Clear notification after 5 seconds
+      setTimeout(() => {
+        setNotificationMessage(null)
+        setNotificationType(null)
+      }, 5000)
+    }
+  }
 
   return (
     <div>
       <Notification message={notificationMessage} type={notificationType} />
 
-      {user === null ?
+      {user === null ? (
         <Login
           username={username}
           password={password}
@@ -69,11 +106,12 @@ const App = () => {
           setPassword={setPassword}
           setNotificationMessage={setNotificationMessage}
           setNotificationType={setNotificationType}
-        /> :
+        />
+      ) : (
         <div>
           <p>{user.name} logged-in</p>
           <button onClick={handleLogout}>Logout</button>
-          <Togglable openLabel="Add a new blog" closeLabel="Cancle">
+          <Togglable openLabel="Add a new blog" closeLabel="Cancel">
             {(toggleVisibility) => (
               <AddBlog
                 blogs={blogs}
@@ -89,22 +127,18 @@ const App = () => {
           <h2>Blogs</h2>
 
           {blogs
-            .slice() // Copy to avoid mutation
-            .sort((a, b) => b.likes - a.likes) // Sort by likes, descending
+            .slice()
+            .sort((a, b) => b.likes - a.likes)
             .map((blog) => (
               <Blog
-                key={blog.id} // Unique key for each Blog component
+                key={blog.id}
                 blog={blog}
                 handleAddLike={handleAddLike}
-                // handleDelete={() => handleDelete(blog)}
+                handleDelete={() => handleDelete(blog)}
               />
             ))}
-
-
-
-
         </div>
-      }
+      )}
     </div>
   )
 }
