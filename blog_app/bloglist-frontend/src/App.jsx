@@ -8,78 +8,70 @@ import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([]) // changed to an array to hold multiple blogs
-  const [newBlog, setNewBlog] = useState({ title: "", author: "", url: "" })
+  const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '' })
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [notificationMessage, setNotificationMessage] = useState(null);
-  const [notificationType, setNotificationType] = useState(null);
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [notificationType, setNotificationType] = useState(null)
 
-  // useEffect(() => {
-  //   blogService.getAll().then(initialBlogs =>
-  //     setBlogs(initialBlogs))
-  // }, [])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user) // Set user object in state
-      blogService.setToken(user.token) // Set the token for authenticated requests
+      setUser(user)
+      blogService.setToken(user.token)
     }
 
-    // Fetch initial blogs
-    blogService.getAll().then(initialBlogs => setBlogs(initialBlogs))
-  }, [])
+    // 初次挂载时加载博客列表
+    blogService.getAll().then((initialBlogs) => setBlogs(initialBlogs))
+  }, []) // 空依赖数组，确保仅在初次挂载时执行
+
 
   const handleLogout = () => {
     setUser(null)
     setUsername('')
     setPassword('')
     window.localStorage.removeItem('loggedBlogappUser') // Clear user data from local storage
-
   }
-  const handleDelete = async (blog, user) => {
+  const handleDelete = async (blog) => {
     if (window.confirm(`Do you really want to delete "${blog.title}"?`)) {
       try {
-        const deleteBlog = await blogService.deleteBlog(blog.id)
-        console.log(deleteBlog)
-        console.log('to delete', blog.title)
+        await blogService.deleteBlog(blog.id) // 发送删除请求
+
+        // 重新获取博客列表，以确保状态同步
         setBlogs(blogs.filter(b => b.id !== blog.id))
 
         setNotificationMessage(`Deleted blog: ${blog.title}`)
         setNotificationType('success')
         setTimeout(() => setNotificationMessage(null), 5000)
-      }
-      catch (error) {
-        console.error("Failed to delete blog:", error.response?.data || error)
-        setNotificationMessage("Failed to delete blog")
+      } catch (error) {
+        console.error('Failed to delete blog:', error.response?.data || error)
+        setNotificationMessage('Failed to delete blog')
         setNotificationType('error')
         setTimeout(() => setNotificationMessage(null), 5000)
       }
-
     }
-
-
   }
+
   const handleAddLike = async (blog) => {
     const blogId = blog.id
     const updatedBlog = {
       ...blog,
       likes: blog.likes + 1,
-      user: blog.user ? blog.user.id : undefined  // Ensure user ID is sent, not the entire user object
-
+      user: blog.user ? blog.user.id : undefined, // Ensure user ID is sent, not the entire user object
     }
     const response = await blogService.update(blogId, updatedBlog)
     console.log('Updated Blog:', response)
-    setBlogs(blogs.map(b => (b.id !== blog.id ? b : response)))
+    setBlogs(blogs.map((b) => (b.id !== blog.id ? b : response)))
   }
 
   return (
     <div>
       <Notification message={notificationMessage} type={notificationType} />
 
-      {user === null ?
+      {user === null ? (
         <Login
           username={username}
           password={password}
@@ -88,7 +80,8 @@ const App = () => {
           setPassword={setPassword}
           setNotificationMessage={setNotificationMessage}
           setNotificationType={setNotificationType}
-        /> :
+        />
+      ) : (
         <div>
           <p>{user.name} logged-in</p>
           <button onClick={handleLogout}>Logout</button>
@@ -110,15 +103,16 @@ const App = () => {
           {blogs
             .slice() // Make a copy of blogs to avoid mutation
             .sort((a, b) => b.likes - a.likes) // Sort by likes, descending
-            .map(blog => (
-              (<Blog key={blog.id} blog={blog} handleAddLike={handleAddLike} handleDelete={() => handleDelete(blog)} />
-              )
+            .map((blog) => (
+              <Blog
+                key={blog.id}
+                blog={blog}
+                handleAddLike={handleAddLike}
+                handleDelete={() => handleDelete(blog)}
+              />
             ))}
-
-
-
         </div>
-      }
+      )}
     </div>
   )
 }

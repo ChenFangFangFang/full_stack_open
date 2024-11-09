@@ -1,4 +1,4 @@
-import Togglable from "./Togglable"
+import Togglable from './Togglable'
 
 const Blog = ({ blog, handleAddLike, handleDelete }) => (
   <div>
@@ -8,7 +8,8 @@ const Blog = ({ blog, handleAddLike, handleDelete }) => (
         <div>
           <p>{blog.url}</p>
           <p>
-            likes: {blog.likes} <button onClick={() => handleAddLike(blog)}>Like</button>
+            likes: {blog.likes}
+            <button onClick={() => handleAddLike(blog)}>Like</button>
           </p>
           <p>{blog.author}</p>
           <button onClick={handleDelete}>Delete</button>
