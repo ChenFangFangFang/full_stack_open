@@ -39,6 +39,29 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser') // Clear user data from local storage
 
   }
+  const handleDelete = async (blog, user) => {
+    if (window.confirm(`Do you really want to delete "${blog.title}"?`)) {
+      try {
+        const deleteBlog = await blogService.deleteBlog(blog.id)
+        console.log(deleteBlog)
+        console.log('to delete', blog.title)
+        setBlogs(blogs.filter(b => b.id !== blog.id))
+
+        setNotificationMessage(`Deleted blog: ${blog.title}`)
+        setNotificationType('success')
+        setTimeout(() => setNotificationMessage(null), 5000)
+      }
+      catch (error) {
+        console.error("Failed to delete blog:", error.response?.data || error)
+        setNotificationMessage("Failed to delete blog")
+        setNotificationType('error')
+        setTimeout(() => setNotificationMessage(null), 5000)
+      }
+
+    }
+
+
+  }
   const handleAddLike = async (blog) => {
     const blogId = blog.id
     const updatedBlog = {
@@ -50,11 +73,7 @@ const App = () => {
     const response = await blogService.update(blogId, updatedBlog)
     console.log('Updated Blog:', response)
     setBlogs(blogs.map(b => (b.id !== blog.id ? b : response)))
-
-
   }
-
-
 
   return (
     <div>
@@ -88,10 +107,13 @@ const App = () => {
           </Togglable>
           <h2>Blogs</h2>
 
-          {blogs.map(blog => (
-            (<Blog key={blog.id} blog={blog} handleAddLike={handleAddLike} />
-            )
-          ))}
+          {blogs
+            .slice() // Make a copy of blogs to avoid mutation
+            .sort((a, b) => b.likes - a.likes) // Sort by likes, descending
+            .map(blog => (
+              (<Blog key={blog.id} blog={blog} handleAddLike={handleAddLike} handleDelete={() => handleDelete(blog)} />
+              )
+            ))}
 
 
 

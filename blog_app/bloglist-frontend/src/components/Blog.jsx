@@ -1,6 +1,6 @@
 import Togglable from "./Togglable"
 
-const Blog = ({ blog, handleAddLike, handleDeleteBlog }) => (
+const Blog = ({ blog, handleAddLike, handleDelete }) => (
   <div>
     <h3>{blog.title} </h3>
     <Togglable openLabel="Show" closeLabel="Hide">
@@ -11,7 +11,7 @@ const Blog = ({ blog, handleAddLike, handleDeleteBlog }) => (
             likes: {blog.likes} <button onClick={() => handleAddLike(blog)}>Like</button>
           </p>
           <p>{blog.author}</p>
-          <button onClick={() => handleDeleteBlog(blog)}>Delete</button>
+          <button onClick={handleDelete}>Delete</button>
         </div>
       )}
     </Togglable>

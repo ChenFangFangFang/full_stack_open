@@ -50,9 +50,9 @@ POST http://localhost:3001/api/users
 content-type: application/json
 
 {
-    "username": "user_fang_11",
+    "username": "user",
     "name": "user_fang",
-    "password": "1"
+    "password": "123456"
 }
 
 ### 
