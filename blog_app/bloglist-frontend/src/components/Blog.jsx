@@ -1,7 +1,7 @@
 import Togglable from './Togglable'
 
 const Blog = ({ blog, handleAddLike, handleDelete }) => (
-  <div>
+  <div className="blog">
     <h3>{blog.title} </h3>
     <Togglable openLabel="Show" closeLabel="Hide">
       {() => (
