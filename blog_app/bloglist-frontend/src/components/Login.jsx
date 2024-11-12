@@ -1,70 +1,39 @@
-import loginService from '../services/login'
-import blogService from '../services/blogs'
-import { useEffect } from 'react'
-import PropTypes from 'prop-types'
 
-const Login = ({
-  username,
-  password,
-  setUser,
-  setUsername,
-  setPassword,
-  setNotificationMessage,
-  setNotificationType
-}) => {
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
-    }
-  }, [])
-  const handleLogin = async event => {
+import {  useState } from 'react'
+
+const Login = ({ login }) => {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const handleLogin = (event) => {
     event.preventDefault()
-    try {
-      const user = await loginService.login({
-        username,
-        password
-      })
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUser(user)
-      setUsername('')
-      setPassword('')
-    } catch (exception) {
-      setNotificationMessage('Wrong username or password')
-      setNotificationType('delete')
-      setTimeout(() => {
-        setNotificationMessage(null)
-        setNotificationType(null)
-      }, 5000)
-    }
+    login({ username,password })
+    setUsername('')
+    setPassword('')
   }
   return (
-    <div>
-      <form onSubmit={handleLogin}>
-        <div>
+
+    <form onSubmit={handleLogin}>
+      <label>
           username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
+        <input
+          type="text"
+          data-testid='username'
+          value={username}
+          onChange={({ target }) => setUsername(target.value)}
+        />
+      </label>
+      <label>
           password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </div>
+        <input
+          type="password"
+          value={password}
+          data-testid='password'
+          onChange={({ target }) => setPassword(target.value)}
+        />
+      </label>
+      <input type="submit" value="Login" />
+    </form>
+
   )
 }
 

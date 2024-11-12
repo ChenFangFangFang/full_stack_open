@@ -1,146 +1,115 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, createRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
+import loginService from './services/login'
 import Notification from './components/Notification'
 import AddBlog from './components/AddBlog'
 import Login from './components/Login'
 import Togglable from './components/Togglable'
+import userStorage from './services/userStorage'
+
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '' })
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [notificationMessage, setNotificationMessage] = useState(null)
-  const [notificationType, setNotificationType] = useState(null)
+  const [notification, setNotification] = useState(null)
 
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      // Check for logged in user
-      const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-      if (loggedUserJSON) {
-        const user = JSON.parse(loggedUserJSON)
-        setUser(user)
-        blogService.setToken(user.token)
-      }
+  useEffect( () => {
+    blogService.getAll().then(blogs => setBlogs(blogs))
+  },[])
 
-      // Fetch blogs
-      try {
-        const initialBlogs = await blogService.getAll()
-        setBlogs(initialBlogs)
-      } catch (error) {
-        setNotificationMessage('Failed to fetch blogs')
-        setNotificationType('error')
-        setTimeout(() => setNotificationMessage(null), 5000)
-      }
+  useEffect ( () => {
+    const user = userStorage.loadUser()
+    if (user) {
+      setUser(user)
     }
+  },[])
+  const notify = (message, type = 'success') => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
+  const blogFormRef = createRef()
+  const handleLogin = async (credentials) => {
+    try {
+      const user = await loginService.login(credentials)
+      setUser(user)
+      userStorage.saveUser(user)
+      notify(`Welcome back, ${user.name}`)
 
-    fetchInitialData()
-  }, [])
+    } catch (error) {
+      notify('Wrong credentials', 'error')
+    }
+  }
+  const handleAddBlog = async (blog) => {
+    const newBlog = await blogService.create(blog)
+    setBlogs(blogs.concat(newBlog))
+    notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
+    blogFormRef.current.toggleVisibility()
 
+  }
   const handleLogout = () => {
     setUser(null)
-    setUsername('')
-    setPassword('')
-    window.localStorage.removeItem('loggedBlogappUser')
-    blogService.setToken(null) // Clear the token
+    userStorage.removeUser()
+    notify(`Bye, ${user.name}!`)
   }
 
   const handleAddLike = async (blog) => {
-    try {
-      const updatedBlog = {
-        ...blog,
-        likes: blog.likes + 1,
-        user: blog.user?.id // Use optional chaining
-      }
-      const response = await blogService.update(blog.id, updatedBlog)
-      setBlogs(blogs.map(b => (b.id !== blog.id ? b : response)))
-    } catch (error) {
-      setNotificationMessage('Failed to update likes')
-      setNotificationType('error')
-      setTimeout(() => setNotificationMessage(null), 5000)
-    }
+    console.log('updating', blog)
+
+    const updatedBlog = await blogService.update(blog.id, {
+      ...blog,
+      likes: blog.likes + 1
+    })
+
+    notify(`You liked ${updatedBlog.title} by ${updatedBlog.author}`)
+    setBlogs(blogs.map(b => b.id === blog.id ? updatedBlog : b))
   }
 
   const handleDelete = async (blog) => {
     if (!window.confirm(`Do you really want to delete "${blog.title}"?`)) {
-      return
-    }
-
-    try {
-      const deleted = await blogService.deleteBlog(blog.id)
-      if (deleted) {
-        // Update the local state to remove the deleted blog
-        setBlogs(prevBlogs => prevBlogs.filter(b => b.id !== blog.id))
-        setNotificationMessage(`Successfully deleted blog: ${blog.title}`)
-        setNotificationType('success')
-      } else {
-        throw new Error('Failed to delete blog')
-      }
-    } catch (error) {
-      console.error('Delete error:', error)
-      setNotificationMessage(
-        `Failed to delete blog: ${error.response?.data?.error || error.message}`
-      )
-      setNotificationType('error')
-    } finally {
-      // Clear notification after 5 seconds
-      setTimeout(() => {
-        setNotificationMessage(null)
-        setNotificationType(null)
-      }, 5000)
+      await blogService.deleteBlog(blog.id)
+      setBlogs(blogs.filter(b => b.id !== blog.id))
+      notify(`Blog ${blog.title}, by ${blog.author} removed`)
     }
   }
 
+  if (!user){
+    return (
+      <div>
+        <h2>Blogs</h2>
+        <Notification notification={notification} />
+        <Login login={handleLogin} />
+      </div>
+    )
+  }
+  const byLikes = (a,b) => b.likes - a.likes
   return (
     <div>
-      <Notification message={notificationMessage} type={notificationType} />
-
-      {user === null ? (
-        <Login
-          username={username}
-          password={password}
-          setUser={setUser}
-          setUsername={setUsername}
-          setPassword={setPassword}
-          setNotificationMessage={setNotificationMessage}
-          setNotificationType={setNotificationType}
-        />
-      ) : (
-        <div>
-          <p>{user.name} logged-in</p>
-          <button onClick={handleLogout}>Logout</button>
-          <Togglable openLabel="Add a new blog" closeLabel="Cancel">
-            {(toggleVisibility) => (
-              <AddBlog
-                blogs={blogs}
-                setBlogs={setBlogs}
-                newBlog={newBlog}
-                setNewBlog={setNewBlog}
-                setNotificationMessage={setNotificationMessage}
-                setNotificationType={setNotificationType}
-                toggleVisibility={toggleVisibility}
-              />
-            )}
-          </Togglable>
-          <h2>Blogs</h2>
-
-          {blogs
-            .slice()
-            .sort((a, b) => b.likes - a.likes)
-            .map((blog) => (
-              <Blog
-                key={blog.id}
-                blog={blog}
-                handleAddLike={handleAddLike}
-                handleDelete={() => handleDelete(blog)}
-              />
-            ))}
-        </div>
-      )}
+      <h2>Blogs</h2>
+      <Notification notification={notification} />
+      <div>
+        {user.name} logged in
+        <button onClick={handleLogout}>Logout</button>
+      </div>
+      <div>
+        <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+          <AddBlog newBlog= {handleAddBlog} />
+        </Togglable>
+        {blogs.sort(byLikes).map(blog =>
+          <Blog
+            key={blog.id}
+            blog={blog}
+            handleAddLike={handleAddLike}
+            handleDelete={handleDelete}
+          />
+        )}
+      </div>
     </div>
   )
 }
+
+
 
 export default App

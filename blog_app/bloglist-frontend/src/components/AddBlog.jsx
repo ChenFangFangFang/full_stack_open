@@ -1,68 +1,52 @@
-import blogService from '../services/blogs'
+import React, { useState } from 'react'
+const AddBlog = ({ newBlog }) => {
+  const [title,setTitle] = useState('')
+  const [url,setUrl] = useState('')
+  const [author, setAuthor] = useState('')
 
-const AddBlog = ({
-  blogs,
-  setBlogs,
-  newBlog,
-  setNewBlog,
-  setNotificationMessage,
-  setNotificationType,
-  toggleVisibility
-}) => {
-  const addBlog = async (event) => {
-    event.preventDefault()
-    try {
-      const addedBlog = await blogService.create(newBlog)
-      console.log('Added blog:', addedBlog) // Check what is returned
-      setNotificationMessage(`A new blog ${newBlog.title} added`)
-      setNotificationType('success')
-      setTimeout(() => {
-        setNotificationMessage(null)
-        setNotificationType(null)
-      }, 5000)
-      setBlogs(blogs.concat(addedBlog)) // Update the blogs list with the new blog
-      setNewBlog({ title: '', author: '', url: '' })
-      toggleVisibility() // Clear the form fields
-    } catch (exception) {
-      console.log(exception)
-      setNotificationMessage('Failed to add blog')
-      setNotificationType('delete')
-      setTimeout(() => setNotificationMessage(null), 5000)
-    }
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value)
+  }
+  const handleUrlChange = (event) => {
+    setUrl(event.target.value)
+  }
+  const handleAuthorChange = (event) => {
+    setAuthor(event.target.value)
   }
 
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    newBlog( { title, url, author } )
+    setAuthor('')
+    setTitle('')
+    setUrl('')
+  }
   return (
     <div className='addBlog'>
       <h2>Add a new blog</h2>
-      <form onSubmit={addBlog}>
+      <form onSubmit={handleSubmit}>
         <div>
           Title:
           <input
-            placeholder='The Title of the blog'
-            value={newBlog.title}
-            onChange={(event) =>
-              setNewBlog({ ...newBlog, title: event.target.value })
-            }
+            data-testid='title'
+            value={title}
+            onChange={handleTitleChange}
           />
         </div>
         <div>
           Author:
           <input
-            placeholder='The author of the blog'
-            value={newBlog.author}
-            onChange={(event) =>
-              setNewBlog({ ...newBlog, author: event.target.value })
-            }
+            data-testid='author'
+            value={author}
+            onChange={handleAuthorChange}
           />
         </div>
         <div>
           Url:
           <input
-            placeholder='The URL of the blog'
-            value={newBlog.url}
-            onChange={(event) =>
-              setNewBlog({ ...newBlog, url: event.target.value })
-            }
+            data-testid='url'
+            value={url}
+            onChange={handleUrlChange}
           />
         </div>
         <button type="submit">Create</button>
@@ -70,4 +54,5 @@ const AddBlog = ({
     </div>
   )
 }
+
 export default AddBlog

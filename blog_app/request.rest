@@ -64,3 +64,13 @@ content-type: application/json
     "username": "root",
     "password": "salainen"
 }
+
+### 
+#Login
+POST http://localhost:3001/api/login
+content-type: application/json
+
+{
+    "username": "user",
+    "password": "123456"
+}
