@@ -32,12 +32,13 @@ const AddBlog = ({
   }
 
   return (
-    <div>
+    <div className='addBlog'>
       <h2>Add a new blog</h2>
       <form onSubmit={addBlog}>
         <div>
           Title:
           <input
+            placeholder='The Title of the blog'
             value={newBlog.title}
             onChange={(event) =>
               setNewBlog({ ...newBlog, title: event.target.value })
@@ -47,6 +48,7 @@ const AddBlog = ({
         <div>
           Author:
           <input
+            placeholder='The author of the blog'
             value={newBlog.author}
             onChange={(event) =>
               setNewBlog({ ...newBlog, author: event.target.value })
@@ -56,6 +58,7 @@ const AddBlog = ({
         <div>
           Url:
           <input
+            placeholder='The URL of the blog'
             value={newBlog.url}
             onChange={(event) =>
               setNewBlog({ ...newBlog, url: event.target.value })

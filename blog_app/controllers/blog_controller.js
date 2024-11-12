@@ -4,15 +4,13 @@ const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 const userExtractor = require('../utils/middleware').userExtractor
 
-
-
 blogRouter.get('/', async (request, response) => {
-
     const blogs = await Blog
         .find({}).populate('user', { username: 1, name: 1 })
     response.json(blogs);
 
 });
+
 blogRouter.get('/:id', async (request, response, next) => {
 
     const blog = await Blog.findById(request.params.id);
@@ -24,7 +22,7 @@ blogRouter.get('/:id', async (request, response, next) => {
 
 });
 
-blogRouter.post('/', userExtractor, async (request, response, next) => {
+blogRouter.post('/', userExtractor, async (request, response) => {
     const blog = new Blog(request.body)
     const user = request.user
     if (!user) {
@@ -40,9 +38,6 @@ blogRouter.post('/', userExtractor, async (request, response, next) => {
 
     await user.save();
     const savedBlog = await blog.save();
-    user.blogs = user.blogs.concat(savedBlog._id);
-
-
     response.status(201).json(savedBlog);
 
 })
@@ -54,12 +49,10 @@ blogRouter.delete('/:id', userExtractor, async (request, response, next) => {
         return response.status(204).end
     }
 
-    // Check if the authenticated user is the creator of the blog
-    if (blog.user.toString() !== user._id.toString()) {
+    if (blog.user &&  blog.user.toString() !== user._id.toString()) {
         return response.status(403).json({ error: 'only the creator can delete this blog' });
     }
 
-    // User is authorized to delete the blog
     await Blog.deleteOne()
     user.blogs = user.blogs.filter(b => b._id.toString() !== blog._id.toString())
 
@@ -69,7 +62,7 @@ blogRouter.delete('/:id', userExtractor, async (request, response, next) => {
 });
 
 
-blogRouter.put('/:id', async (request, response, next) => {
+blogRouter.put('/:id', async (request, response) => {
     const body = request.body
 
     const blog = {

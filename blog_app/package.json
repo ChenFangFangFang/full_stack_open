@@ -5,7 +5,8 @@
   "scripts": {
     "start": "NODE_ENV=production node index.js",
     "dev": "NODE_ENV=development nodemon index.js",
-    "test": "NODE_ENV=test node --test",
+    "test": "NODE_ENV=test node --test --test-concurrency=1",
+    "start:test": "NODE_ENV=test node index.js",
     "lint": "eslint ."
   },
   "author": "Shiyang Chen",
@@ -24,7 +25,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
+    "@playwright/test": "^1.48.2",
     "@stylistic/eslint-plugin-js": "^2.10.1",
+    "@types/node": "^22.9.0",
     "eslint": "^9.14.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",

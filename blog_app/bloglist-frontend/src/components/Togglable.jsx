@@ -14,7 +14,7 @@ const Togglable = ({ openLabel, closeLabel, children }) => {
       </button>
       {visible && (
         <div className="togglableContent">
-          {children()}
+          {children(toggleVisibility)}
         </div>
       )}
     </div>
