@@ -19,10 +19,12 @@ const Blog = ({ blog,handleAddLike,handleDelete }) => {
   return (
     <div style={style} className='blog'>
       {blog.title} Author: {blog.author}
-      <button onClick={() => setVisible(!visible)}>{visible ?'Hide' : 'View'}</button>
+      <button onClick={() => setVisible(!visible)}>
+        {visible ? 'Hide' : 'View'}
+      </button>
       {visible && (
         <div>
-          <div>{blog.url}</div>
+          <div>Link: {blog.url}</div>
           <div>
             Likes: {blog.likes}
             <button
@@ -33,7 +35,9 @@ const Blog = ({ blog,handleAddLike,handleDelete }) => {
             </button>
           </div>
           <div>{nameOfUser}</div>
-          {allowDelete && <button onClick = {() => handleDelete(blog)}>Delete</button>}
+          {allowDelete && <button onClick={() => handleDelete(blog)}>
+            Delete
+          </button>}
         </div>
       )}
     </div>

@@ -15,9 +15,9 @@ Authorization: Bearer
 
 # 
 ###
-DELETE http://localhost:3001/api/blog/672a68e1a64bcc9b4306ecd6
+DELETE http://localhost:3001/api/blog/6733783b2456d288c82d4ce1
 content-type: application/json
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpZCI6IjY3MzM3NmU2MjQ1NmQyODhjODJkNGNjOCIsImlhdCI6MTczMTQzMjU5M30.6ns5Mo11jsVWBloB0GP4Np65KPLj9LGYC0_DAyaHYzY
 
 ###
 PUT http://localhost:3001/api/blog/6728eb662b3ed8bbe065e826
