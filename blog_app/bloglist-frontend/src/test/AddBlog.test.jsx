@@ -1,9 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AddBlog from '../components/AddBlog'
+import {  beforeEach } from 'node:test'
 
 describe('NewBlog', () => {
-  test('calls event handler with correct data', async () => {
+
+
+  test('Add a new Blog', async () => {
     const user = userEvent.setup()
     const newBlog = vi.fn()
 

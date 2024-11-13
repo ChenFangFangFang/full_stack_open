@@ -2,14 +2,17 @@ import { render, screen } from '@testing-library/react'
 import Blog from '../components/Blog'
 import userEvent from '@testing-library/user-event'
 import { describe, test } from 'vitest'
+import {  beforeEach } from 'node:test'
 
-describe('Blog',() => {
+describe('Blog App',() => {
+
   const blog = {
     title: 'Testing the testing',
     url: 'http://example.com',
     author: 'Ted Tester',
     likes: 10
   }
+
   test('renders content', () => {
     const blog = {
       title:'blog-test',
