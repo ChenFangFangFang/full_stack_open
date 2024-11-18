@@ -1,11 +1,12 @@
-import Anecdotes from "./components/Anecdotes"
-import NewAnecdote from "./components/NewAnecdotes"
-
+import AddAne from './components/AddAne'
+import Anecdotes from './components/Anecdotes' 
 const App = () => {
   return (
+   
     <div>
+      <h2>Anecdotes</h2>
       <Anecdotes />
-      <NewAnecdote />
+      <AddAne />
     </div>
   )
 }

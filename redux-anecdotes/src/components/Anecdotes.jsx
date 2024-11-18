@@ -1,8 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { vote } from '../reducers/anecdoteReducer'
-import PropTypes from 'prop-types'; // Import PropTypes for validation
-
-const Anecdote = ({anecdote, handleVote} )=> {
+import PropTypes from 'prop-types'; 
+const AneList = ({anecdote, handleVote} )=> {
     return(
         <div>
         <div>{anecdote.content}</div>
@@ -16,26 +15,28 @@ const Anecdote = ({anecdote, handleVote} )=> {
 const Anecdotes = () => {
     const dispatch = useDispatch()
     const anecdotes = useSelector(state => state)
+    const sortedAnecdotes = [...anecdotes].sort((a, b) => b.votes - a.votes);
 
     return (
         <div>
-             <h2>Anecdotes</h2>
-             {anecdotes.map(anecdote =>
-                <Anecdotes 
+             
+             {sortedAnecdotes.map(anecdote =>
+                <AneList
              key={anecdote.id}
              anecdote={anecdote}
-             handleClick={() => dispatch(vote(anecdote.id))}/>)}
+             handleVote={() => dispatch(vote(anecdote.id))}/>)}
      
         </div>
   
     )
 }
-Anecdote.propTypes = {
+AneList.propTypes = {
   anecdote: PropTypes.shape({
     content: PropTypes.string.isRequired,
     votes: PropTypes.number.isRequired,
   }).isRequired,
   handleVote: PropTypes.func.isRequired,
 }
+
 
 export default Anecdotes
