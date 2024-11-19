@@ -1,3 +1,6 @@
+import { createSlice } from '@reduxjs/toolkit'
+import { showNotification } from './notificationReducer';
+
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -16,44 +19,48 @@ const asObject = (anecdote) => {
     votes: 0
   }
 }
-
 const initialState = anecdotesAtStart.map(asObject)
-
-const anecdoteReducer = (state = initialState, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
-  switch(action.type){
-    case 'NEW_ANE':
-      return [...state, action.data]
-    case 'VOTE':
-      return state.map(anecdote =>
-        anecdote.id === action.payload.id
-          ? { ...anecdote, votes: anecdote.votes + 1 }
-          : anecdote
-      )
-    default:
-    return state
-  }
-}
-
-export const createAne = (content) => {
-  return {
-    type: 'NEW_ANE', // Match the reducer's expected action type
-    data: {
-      content,
-      id: getId(),
-      votes: 0,
+const anecdoteSlice = createSlice({
+  name:'anecdote',
+  initialState,
+  reducers:{
+    createAne(state, action){
+      const content = action.payload
+      state.push({
+        content,
+        votes:0,
+        id:getId()
+      })
     },
+    vote(state, action) {
+      const id = action.payload.id; // Extract the ID from the action
+      const anecdote = state.find((anecdote) => anecdote.id === id); // Find the anecdote
+      if (anecdote) {
+        anecdote.votes += 1; // Directly update the votes
+      }
+    }
+    
+  }
+})
+
+
+
+export const {createAne,vote} = anecdoteSlice.actions
+
+export const addAnecdote = (content) => {
+  return (dispatch) => {
+    dispatch(createAne(content));
+    dispatch(showNotification(`You added: "${content}"`, 5000));
+  };
+};
+
+// Thunk for voting with notification
+export const voteAnecdote = (id, content) => {
+  return (dispatch) => {
+    dispatch(vote({ id }));
+    dispatch(showNotification(`You voted for: "${content}"`, 5000));
   };
 };
 
 
-export const vote = (id) => {
-  return {
-    type:"VOTE",
-    payload:{
-     id,
-    }
-  }
-}
-export default anecdoteReducer
+export default anecdoteSlice.reducer

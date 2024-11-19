@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { vote } from '../reducers/anecdoteReducer'
+import { voteAnecdote } from '../reducers/anecdoteReducer'
 import PropTypes from 'prop-types'; 
 const AneList = ({anecdote, handleVote} )=> {
     return(
@@ -27,7 +27,8 @@ const Anecdotes = () => {
                 <AneList
              key={anecdote.id}
              anecdote={anecdote}
-             handleVote={() => dispatch(vote(anecdote.id))}/>)}
+             handleVote={() => dispatch(voteAnecdote(anecdote.id, anecdote.content))}
+             />)}
      
         </div>
   
