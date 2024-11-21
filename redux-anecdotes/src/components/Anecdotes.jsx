@@ -15,9 +15,12 @@ const AneList = ({anecdote, handleVote} )=> {
 const Anecdotes = () => {
     const dispatch = useDispatch()
     const anecdotes = useSelector(state => state.anecdotes)
-    const filter = useSelector((state) => state.filter); 
+    const filter = useSelector((state) => state.filter)
+    console.log(anecdotes)
     const filteredAnecdotes = anecdotes
     .filter((anecdote) =>
+
+      typeof anecdote.content === 'string' &&
       anecdote.content.toLowerCase().includes(filter.toLowerCase())
     )
     .sort((a, b) => b.votes - a.votes); // Still sort by votes
