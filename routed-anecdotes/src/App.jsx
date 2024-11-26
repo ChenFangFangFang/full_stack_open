@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import{
+import { useField } from './hooks'
+
+import {
   BrowserRouter as Router,
   Routes, Route, Link,
   useParams,
@@ -10,18 +12,18 @@ const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => 
-      <li key={anecdote.id} >
-        <Link to={`/anecdotes/${anecdote.id}`}>
-        {anecdote.content}</Link>
+      {anecdotes.map(anecdote =>
+        <li key={anecdote.id} >
+          <Link to={`/anecdotes/${anecdote.id}`}>
+            {anecdote.content}</Link>
         </li>)}
     </ul>
   </div>
 )
 
-const Anecdote = ({anecdotes}) => {
+const Anecdote = ({ anecdotes }) => {
   const id = useParams().id
-  const anecdote = anecdotes.find(n => n.id === Number(id)) 
+  const anecdote = anecdotes.find(n => n.id === Number(id))
   return (
     <div>
       <h2>{anecdote.content}</h2>
@@ -64,40 +66,42 @@ const Notification = ({ message }) => {
 }
 
 const CreateNew = (props) => {
+  const content = useField('text')
+  const author = useField('text')
+  const info = useField('text')
   const navigagte = useNavigate()
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
-
 
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.inputProps.value,
+      author: author.inputProps.value,
+      info: info.inputProps.value,
       votes: 0
     })
+    
     navigagte('/anecdotes')
+  }
+
+  const handleReset = () => {
+    content.reset()
+    author.reset()
+    info.reset()
   }
 
   return (
     <div>
       <h2>create a new anecdote</h2>
       <form onSubmit={handleSubmit}>
+        <div>Content: <input {...content.inputProps} /></div>
         <div>
-          content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          Author: <input {...author.inputProps} />
         </div>
         <div>
-          author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          Info: <input {...info.inputProps} />
         </div>
-        <div>
-          url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
-        </div>
-        <button>create</button>
+        <button type='sumbit'>Create</button><button type="button"
+        onClick={handleReset}>Reset</button>
       </form>
     </div>
   )
@@ -106,9 +110,9 @@ const CreateNew = (props) => {
 
 const App = () => {
   const padding = {
-    padding:5
+    padding: 5
   }
-  
+
   const [anecdotes, setAnecdotes] = useState([
     {
       content: 'If it hurts, do it more often',
@@ -127,14 +131,14 @@ const App = () => {
   ])
 
   const [succssMessage, setSuccssMessage] = useState(null)
-  
+
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
     setSuccssMessage(`A new anecodte ${anecdote.content} created!`)
-    setTimeout(()=>{
+    setTimeout(() => {
       setSuccssMessage(null)
-    },4000)
+    }, 4000)
   }
 
   const anecdoteById = (id) =>
@@ -158,7 +162,7 @@ const App = () => {
         <Link style={padding} to="/anecdotes">anecdotes</Link>
         <Link style={padding} to="/createanecdotes">createanecdotes</Link>
         <Link style={padding} to="/about">about</Link>
-        
+
       </div>
       <Notification message={succssMessage} />
       <Routes>
@@ -167,10 +171,10 @@ const App = () => {
         <Route path="/anecdotes" element={<AnecdoteList anecdotes={anecdotes} />} />
         <Route path="/createanecdotes" element={<CreateNew addNew={addNew} />} />
         <Route path="/about" element={<About />} />
-        
+
       </Routes>
       <Footer />
-      
+
     </Router>
   )
 }
