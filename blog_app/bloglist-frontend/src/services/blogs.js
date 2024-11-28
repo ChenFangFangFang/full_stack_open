@@ -1,7 +1,6 @@
 import axios from 'axios'
 import user from './userStorage'
 const baseUrl = '/api/blog'
-let token = null
 
 const getConfit = () => ({
   headers: { Authorization: `Bearer ${user.loadUser().token}` }

@@ -7,6 +7,7 @@ import AddBlog from './components/AddBlog'
 import Login from './components/Login'
 import Togglable from './components/Togglable'
 import userStorage from './services/userStorage'
+import { bool } from 'prop-types'
 
 
 const App = () => {
@@ -58,14 +59,14 @@ const App = () => {
   const handleAddLike = async (blog) => {
     console.log('updating', blog)
 
-    const updatedBlog = await blogService.update(blog.id, {
+    const updatedBlog =  {
       ...blog,
       likes: blog.likes + 1
-    })
+    }
+    const response = await blogService.update(blog.id, updatedBlog)
 
     notify(`You liked ${updatedBlog.title} by ${updatedBlog.author}`)
-    setBlogs(blogs.map(b => b.id === blog.id ? updatedBlog : b))
-  }
+    setBlogs(blogs.map(b => b.id === blog.id ? { ...response, user: blog.user } : b))  }
 
   const handleDelete = async (blog) => {
     if (window.confirm(`Do you really want to delete "${blog.title}"?`)) {

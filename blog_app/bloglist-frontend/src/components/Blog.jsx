@@ -1,11 +1,24 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import PropTypes from 'prop-types'
 import userStorage from '../services/userStorage'
 
 const Blog = ({ blog,handleAddLike,handleDelete }) => {
   const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const storedVisibility = localStorage.getItem(`blog-${blog.id}-visible`)
+    if (!storedVisibility){
+      setVisible(JSON.parse(storedVisibility))
+    }
+  },[blog.id])
+  const toggleVisibility = () => {
+    const newVisible = !visible
+    setVisible(newVisible)
+    // Save visibility state to localStorage
+    localStorage.setItem(`blog-${blog.id}-visible`, JSON.stringify(newVisible))
+  }
+  // const nameOfUser = blog.user ? blog.user.name : 'anonymous'
+  const nameOfUser = blog.user && blog.user.name ? blog.user.name : 'anonymous'
 
-  const nameOfUser = blog.user ? blog.user.name : 'anonymous'
 
   const style = {
     border: 'solid',
@@ -19,12 +32,13 @@ const Blog = ({ blog,handleAddLike,handleDelete }) => {
   return (
     <div style={style} className='blog'>
       {blog.title} Author: {blog.author}
-      <button onClick={() => setVisible(!visible)}>
+      <button onClick={toggleVisibility}>
         {visible ? 'Hide' : 'View'}
       </button>
       {visible && (
         <div>
-          <div>Link: {blog.url}</div>
+          <div><a href={blog.url}>{blog.url}</a></div>
+          <div>User: {nameOfUser}</div>
           <div>
             Likes: {blog.likes}
             <button
@@ -34,7 +48,6 @@ const Blog = ({ blog,handleAddLike,handleDelete }) => {
               Like
             </button>
           </div>
-          <div>{nameOfUser}</div>
           {allowDelete && <button onClick={() => handleDelete(blog)}>
             Delete
           </button>}
