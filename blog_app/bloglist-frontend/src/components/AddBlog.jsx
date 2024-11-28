@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 const AddBlog = ({ newBlog }) => {
-  const [title,setTitle] = useState('')
-  const [url,setUrl] = useState('')
+  const [title, setTitle] = useState('')
+  const [url, setUrl] = useState('')
   const [author, setAuthor] = useState('')
 
   const handleTitleChange = (event) => {
@@ -16,19 +16,19 @@ const AddBlog = ({ newBlog }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    newBlog( { title, url, author } )
+    newBlog({ title, url, author })
     setAuthor('')
     setTitle('')
     setUrl('')
   }
   return (
-    <div className='addBlog'>
+    <div className="addBlog">
       <h2>Add a new blog</h2>
       <form onSubmit={handleSubmit}>
         <div>
           Title:
           <input
-            data-testid='title'
+            data-testid="title"
             value={title}
             onChange={handleTitleChange}
           />
@@ -36,18 +36,14 @@ const AddBlog = ({ newBlog }) => {
         <div>
           Author:
           <input
-            data-testid='author'
+            data-testid="author"
             value={author}
             onChange={handleAuthorChange}
           />
         </div>
         <div>
           Url:
-          <input
-            data-testid='url'
-            value={url}
-            onChange={handleUrlChange}
-          />
+          <input data-testid="url" value={url} onChange={handleUrlChange} />
         </div>
         <button type="submit">Create</button>
       </form>

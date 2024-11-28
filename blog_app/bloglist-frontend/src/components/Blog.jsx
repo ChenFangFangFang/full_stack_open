@@ -1,43 +1,44 @@
-import React, { useState,useEffect } from 'react'
-import PropTypes from 'prop-types'
-import userStorage from '../services/userStorage'
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import userStorage from "../services/userStorage";
 
-const Blog = ({ blog,handleAddLike,handleDelete }) => {
-  const [visible, setVisible] = useState(false)
+const Blog = ({ blog, handleAddLike, handleDelete }) => {
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const storedVisibility = localStorage.getItem(`blog-${blog.id}-visible`)
-    if (!storedVisibility){
-      setVisible(JSON.parse(storedVisibility))
+    const storedVisibility = localStorage.getItem(`blog-${blog.id}-visible`);
+    if (!storedVisibility) {
+      setVisible(JSON.parse(storedVisibility));
     }
-  },[blog.id])
+  }, [blog.id]);
   const toggleVisibility = () => {
-    const newVisible = !visible
-    setVisible(newVisible)
+    const newVisible = !visible;
+    setVisible(newVisible);
     // Save visibility state to localStorage
-    localStorage.setItem(`blog-${blog.id}-visible`, JSON.stringify(newVisible))
-  }
+    localStorage.setItem(`blog-${blog.id}-visible`, JSON.stringify(newVisible));
+  };
   // const nameOfUser = blog.user ? blog.user.name : 'anonymous'
-  const nameOfUser = blog.user && blog.user.name ? blog.user.name : 'anonymous'
-
+  const nameOfUser = blog.user && blog.user.name ? blog.user.name : "anonymous";
 
   const style = {
-    border: 'solid',
+    border: "solid",
     padding: 10,
     borderWidth: 1,
-    marginBottom: 5,
-  }
-  const allowDelete = blog.user ? blog.user.username === userStorage.me() : true
-  console.log(blog.user, userStorage.me(), allowDelete)
+    marginBottom: 5
+  };
+  const allowDelete = blog.user
+    ? blog.user.username === userStorage.me()
+    : true;
+  console.log(blog.user, userStorage.me(), allowDelete);
 
   return (
-    <div style={style} className='blog'>
+    <div style={style} className="blog">
       {blog.title} Author: {blog.author}
-      <button onClick={toggleVisibility}>
-        {visible ? 'Hide' : 'View'}
-      </button>
+      <button onClick={toggleVisibility}>{visible ? "Hide" : "View"}</button>
       {visible && (
         <div>
-          <div><a href={blog.url}>{blog.url}</a></div>
+          <div>
+            <a href={blog.url}>{blog.url}</a>
+          </div>
           <div>User: {nameOfUser}</div>
           <div>
             Likes: {blog.likes}
@@ -48,24 +49,24 @@ const Blog = ({ blog,handleAddLike,handleDelete }) => {
               Like
             </button>
           </div>
-          {allowDelete && <button onClick={() => handleDelete(blog)}>
-            Delete
-          </button>}
+          {allowDelete && (
+            <button onClick={() => handleDelete(blog)}>Delete</button>
+          )}
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 Blog.propTypes = {
   blog: PropTypes.shape({
     url: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     likes: PropTypes.number.isRequired,
-    user: PropTypes.object,
+    user: PropTypes.object
   }).isRequired,
   handleAddLike: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired
-}
+};
 
-export default Blog
+export default Blog;

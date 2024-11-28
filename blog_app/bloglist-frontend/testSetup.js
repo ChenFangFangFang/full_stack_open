@@ -6,6 +6,4 @@ afterEach(() => {
   cleanup()
 })
 
-const Blog = ({ blog }) => {
-
-}
+const Blog = ({ blog }) => {}

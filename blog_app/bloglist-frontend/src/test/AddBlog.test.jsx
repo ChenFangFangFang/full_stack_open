@@ -1,11 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AddBlog from '../components/AddBlog'
-import {  beforeEach } from 'node:test'
+import { beforeEach } from 'node:test'
 
 describe('NewBlog', () => {
-
-
   test('Add a new Blog', async () => {
     const user = userEvent.setup()
     const newBlog = vi.fn()
@@ -26,7 +24,7 @@ describe('NewBlog', () => {
     expect(newBlog.mock.calls[0][0]).toEqual({
       title: 'Testing the testing',
       url: 'http://example.com',
-      author: 'Ted Tester'
+      author: 'Ted Tester',
     })
   })
 })
