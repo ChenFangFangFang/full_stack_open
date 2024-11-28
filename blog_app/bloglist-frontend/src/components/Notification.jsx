@@ -2,10 +2,7 @@ import { useSelector } from "react-redux";
 
 const Notification = () => {
   const notification = useSelector((state) => state.notification); // Fetch notification from Redux store
-  if (
-    !notification ||
-    (typeof notification === "object" && !notification.message)
-  ) {
+  if (!notification) {
     return null; // Don't render anything if there's no notification
   }
   const style = {
