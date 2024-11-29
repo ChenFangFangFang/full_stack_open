@@ -1,26 +1,22 @@
-import React, { useState } from "react";
-const AddBlog = ({ newBlog }) => {
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
-  const [author, setAuthor] = useState("");
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { addBlog, updateFormField } from "../reducers/blogListReducer";
+const AddBlog = () => {
+  const dispatch = useDispatch();
+  const form = useSelector((state) => state.blogs.form);
+  console.log("Form from Redux:", form); // This should log the form state
 
-  const handleTitleChange = (event) => {
-    setTitle(event.target.value);
-  };
-  const handleUrlChange = (event) => {
-    setUrl(event.target.value);
-  };
-  const handleAuthorChange = (event) => {
-    setAuthor(event.target.value);
+  const { title, author, url } = form || {};
+
+  const handleInputChange = (field) => (event) => {
+    dispatch(updateFormField({ field, value: event.target.value }));
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    newBlog({ title, url, author });
-    setAuthor("");
-    setTitle("");
-    setUrl("");
+    dispatch(addBlog());
   };
+
   return (
     <div className="addBlog">
       <h2>Add a new blog</h2>
@@ -30,7 +26,7 @@ const AddBlog = ({ newBlog }) => {
           <input
             data-testid="title"
             value={title}
-            onChange={handleTitleChange}
+            onChange={handleInputChange("title")}
           />
         </div>
         <div>
@@ -38,12 +34,16 @@ const AddBlog = ({ newBlog }) => {
           <input
             data-testid="author"
             value={author}
-            onChange={handleAuthorChange}
+            onChange={handleInputChange("author")}
           />
         </div>
         <div>
           Url:
-          <input data-testid="url" value={url} onChange={handleUrlChange} />
+          <input
+            data-testid="url"
+            value={url}
+            onChange={handleInputChange("url")}
+          />
         </div>
         <button type="submit">Create</button>
       </form>
