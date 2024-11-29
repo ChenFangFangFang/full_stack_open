@@ -1,6 +1,5 @@
 import { useState, useEffect, createRef } from "react";
 import Blog from "./components/Blog";
-import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Notification from "./components/Notification";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,25 +9,31 @@ import AddBlog from "./components/AddBlog";
 import Login from "./components/Login";
 import Togglable from "./components/Togglable";
 import userStorage from "./services/userStorage";
-
+import { setUser, clearUser } from "./reducers/userReducer";
 const App = () => {
   const dispatch = useDispatch();
-
-  //const [blogs, setBlogs] = useState([]);
   const blogs = useSelector((state) => state.blogs.blogs || []);
+  const user = useSelector((state) => state.user);
+
   useEffect(() => {
     console.log("Dispatching initializeBlogs...");
     dispatch(initializeBlogs());
   }, [dispatch]);
   console.log("Blog", blogs);
-  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const user = userStorage.loadUser();
-    if (user) {
-      setUser(user);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const loggedUser = window.localStorage.getItem("loggedUser");
+  //   if (loggedUser) {
+  //     try {
+  //       const parsedUser = JSON.parse(loggedUser);
+  //       console.log(window.localStorage.getItem("loggedUser"));
+
+  //       dispatch(setUser(parsedUser)); // Restore the user
+  //     } catch (error) {
+  //       console.error("Failed to parse logged user from localStorage:", error);
+  //     }
+  //   }
+  // }, [dispatch]);
   const notify = (message, type = "success") => {
     dispatch(setNotification({ message, type }));
     setTimeout(() => {
@@ -39,7 +44,7 @@ const App = () => {
   const handleLogin = async (credentials) => {
     try {
       const user = await loginService.login(credentials);
-      setUser(user);
+      dispatch(setUser(user));
       userStorage.saveUser(user);
       notify(`Welcome back, ${user.name}`);
     } catch (error) {
@@ -48,7 +53,7 @@ const App = () => {
   };
 
   const handleLogout = () => {
-    setUser(null);
+    dispatch(clearUser());
     userStorage.removeUser();
     notify(`Bye, ${user.name}!`);
   };
@@ -73,7 +78,9 @@ const App = () => {
       </div>
       <div>
         <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-          <AddBlog />
+          <AddBlog
+            onBlogCreated={() => blogFormRef.current.toggleVisibility()}
+          />
         </Togglable>
         {blogs
           .slice()

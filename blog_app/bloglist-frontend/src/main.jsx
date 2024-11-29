@@ -4,11 +4,12 @@ import { configureStore } from "@reduxjs/toolkit";
 import notificationReducer from "./reducers/notificationReducer";
 import blogListReducer from "./reducers/blogListReducer";
 import { Provider } from "react-redux";
-
+import userReducer from "./reducers/userReducer";
 const store = configureStore({
   reducer: {
     notification: notificationReducer,
-    blogs: blogListReducer //blogs 和app 中的对应
+    blogs: blogListReducer, //blogs 和app 中的对应,
+    user: userReducer
   }
 });
 ReactDOM.createRoot(document.getElementById("root")).render(

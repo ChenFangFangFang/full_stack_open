@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addBlog, updateFormField } from "../reducers/blogListReducer";
-const AddBlog = () => {
+const AddBlog = ({ onBlogCreated }) => {
   const dispatch = useDispatch();
   const form = useSelector((state) => state.blogs.form);
   console.log("Form from Redux:", form); // This should log the form state
@@ -15,6 +15,7 @@ const AddBlog = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     dispatch(addBlog());
+    if (onBlogCreated) onBlogCreated();
   };
 
   return (
