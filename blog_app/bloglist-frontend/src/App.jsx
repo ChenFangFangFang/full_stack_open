@@ -11,7 +11,7 @@ import Togglable from "./components/Togglable";
 import userStorage from "./services/userStorage";
 import { setUser, clearUser } from "./reducers/userReducer";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import TestRouter from "./components/Users";
+import Users from "./components/Users";
 import Layout from "./components/Layout";
 const App = () => {
   const dispatch = useDispatch();
@@ -22,7 +22,6 @@ const App = () => {
     console.log("Dispatching initializeBlogs...");
     dispatch(initializeBlogs());
   }, [dispatch]);
-  console.log("Blog", blogs);
 
   const notify = (message, type = "success") => {
     dispatch(setNotification({ message, type }));
@@ -89,7 +88,7 @@ const App = () => {
           path="/users"
           element={
             <Layout user={user} handleLogout={handleLogout}>
-              <TestRouter />
+              <Users />
             </Layout>
           }
         />
