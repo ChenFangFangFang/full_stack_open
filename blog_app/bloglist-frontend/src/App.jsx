@@ -10,6 +10,9 @@ import Login from "./components/Login";
 import Togglable from "./components/Togglable";
 import userStorage from "./services/userStorage";
 import { setUser, clearUser } from "./reducers/userReducer";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import TestRouter from "./components/Users";
+import Layout from "./components/Layout";
 const App = () => {
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs.blogs || []);
@@ -21,19 +24,6 @@ const App = () => {
   }, [dispatch]);
   console.log("Blog", blogs);
 
-  // useEffect(() => {
-  //   const loggedUser = window.localStorage.getItem("loggedUser");
-  //   if (loggedUser) {
-  //     try {
-  //       const parsedUser = JSON.parse(loggedUser);
-  //       console.log(window.localStorage.getItem("loggedUser"));
-
-  //       dispatch(setUser(parsedUser)); // Restore the user
-  //     } catch (error) {
-  //       console.error("Failed to parse logged user from localStorage:", error);
-  //     }
-  //   }
-  // }, [dispatch]);
   const notify = (message, type = "success") => {
     dispatch(setNotification({ message, type }));
     setTimeout(() => {
@@ -68,28 +58,43 @@ const App = () => {
     );
   }
   const byLikes = (a, b) => b.likes - a.likes;
+  const padding = {
+    padding: 5
+  };
+
   return (
-    <div>
-      <h2>Blogs</h2>
-      <Notification />
-      <div>
-        {user.name} logged in
-        <button onClick={handleLogout}>Logout</button>
-      </div>
-      <div>
-        <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-          <AddBlog
-            onBlogCreated={() => blogFormRef.current.toggleVisibility()}
-          />
-        </Togglable>
-        {blogs
-          .slice()
-          .sort(byLikes)
-          .map((blog) => (
-            <Blog key={blog.id} blog={blog} />
-          ))}
-      </div>
-    </div>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Layout user={user} handleLogout={handleLogout}>
+              <h2>Blogs</h2>
+              <Notification />
+              <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+                <AddBlog
+                  onBlogCreated={() => blogFormRef.current.toggleVisibility()}
+                />
+              </Togglable>
+              {blogs
+                .slice()
+                .sort(byLikes)
+                .map((blog) => (
+                  <Blog key={blog.id} blog={blog} />
+                ))}
+            </Layout>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <Layout user={user} handleLogout={handleLogout}>
+              <TestRouter />
+            </Layout>
+          }
+        />
+      </Routes>
+    </Router>
   );
 };
 
