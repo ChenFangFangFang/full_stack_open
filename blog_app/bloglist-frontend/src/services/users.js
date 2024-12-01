@@ -12,5 +12,23 @@ const getAll = () => {
       return []; // Return an empty array on error
     });
 };
-
-export default { getAll };
+const getBlog = async ({ userId }) => {
+  try {
+    const response = await axios.get(`${baseUrl}/${userId}`);
+    console.log("Fetched from API:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching blogs for user ${userId}:`, error);
+    return [];
+  }
+};
+const getById = async (id) => {
+  try {
+    const response = await axios.get(`${baseUrl}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching user by ID (${id}):`, error);
+    return null; // Return null on error
+  }
+};
+export default { getAll, getBlog, getById };
