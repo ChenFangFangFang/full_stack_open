@@ -33,7 +33,7 @@ Authorization: Bearer
 
 ###
 # USER
-GET http://localhost:3001/api/users
+GET http://localhost:3001/api/users/
 
 ###
 POST http://localhost:3001/api/users
@@ -45,6 +45,15 @@ content-type: application/json
     "password": "salainen"
 }
 
+###
+POST http://localhost:3001/api/users
+content-type: application/json
+
+{
+    "username": "Anni",
+    "name": "Anni",
+    "password": "123456"
+}
 ###
 POST http://localhost:3001/api/users
 content-type: application/json
