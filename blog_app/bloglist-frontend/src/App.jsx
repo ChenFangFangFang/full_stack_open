@@ -23,6 +23,12 @@ const App = () => {
     dispatch(initializeBlogs());
   }, [dispatch]);
 
+  useEffect(() => {
+    const storedUser = userStorage.loadUser();
+    if (storedUser) {
+      dispatch(setUser(storedUser));
+    }
+  }, [dispatch]); //remain login
   const notify = (message, type = "success") => {
     dispatch(setNotification({ message, type }));
     setTimeout(() => {
