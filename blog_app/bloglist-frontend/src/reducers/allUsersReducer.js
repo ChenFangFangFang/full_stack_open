@@ -16,7 +16,11 @@ const usersSlice = createSlice({
       state.userBlogs[userId] = blogs; // Store all users
     },
     addUser(state, action) {
-      state.users.push(action.payload);
+      const user = action.payload;
+      const existingUser = state.users.find((u) => u.id === user.id);
+      if (!existingUser) {
+        state.users.push(user);
+      }
     }
   }
 });

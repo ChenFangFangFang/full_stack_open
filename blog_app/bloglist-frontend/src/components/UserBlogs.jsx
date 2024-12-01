@@ -4,10 +4,13 @@ import { useEffect } from "react";
 import { fetchUserById } from "../reducers/allUsersReducer";
 const UserBlogs = () => {
   const { id } = useParams();
+  console.log("User ID from URL:", id);
+
   const dispatch = useDispatch();
   const user = useSelector((state) =>
     state.users.users.find((user) => user.id === id)
-  ); // Get users from Redux store
+  );
+  console.log("User from Redux:", user);
 
   useEffect(() => {
     if (!user) {
@@ -15,7 +18,7 @@ const UserBlogs = () => {
     }
   }, [user, id, dispatch]);
   if (!user) {
-    return <p>User not found.</p>;
+    return null;
   }
   return (
     <div>
