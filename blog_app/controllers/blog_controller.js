@@ -1,5 +1,6 @@
 const blogRouter = require("express").Router();
 const Blog = require("../models/blog");
+const comment = require("../models/comment");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const userExtractor = require("../utils/middleware").userExtractor;
@@ -10,7 +11,13 @@ blogRouter.get("/", async (request, response) => {
 });
 
 blogRouter.get("/:id", async (request, response, next) => {
-  const blog = await Blog.findById(request.params.id);
+  const blog = await Blog.findById(request.params.id)
+    .populate("user", {
+      name: 1,
+      username: 1
+    })
+    .populate("comments", { content: 1 }); // Populates the 'content' field from comments
+
   if (blog) {
     response.json(blog);
   } else {

@@ -32,5 +32,13 @@ const deleteBlog = async (id) => {
   const response = await axios.delete(`${baseUrl}/${id}`, getConfit());
   return response.data;
 };
-
-export default { getAll, create, update, deleteBlog };
+const getBlogById = async (id) => {
+  try {
+    const response = await axios.get(`${baseUrl}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching blog by ID (${id}):`, error);
+    return null; // Return null on error
+  }
+};
+export default { getAll, create, update, deleteBlog, getBlogById };

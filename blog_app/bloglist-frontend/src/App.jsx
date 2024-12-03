@@ -1,11 +1,13 @@
 import { useState, useEffect, createRef, useId } from "react";
-import Blog from "./components/Blog";
+import Blogs from "./components/Blogs";
 import loginService from "./services/login";
 import Notification from "./components/Notification";
+import Blog from "./components/Blog";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "./reducers/notificationReducer";
 import { initializeBlogs } from "./reducers/blogListReducer";
 import { userBlogsList } from "./reducers/allUsersReducer";
+import { blogInfo } from "./reducers/blogListReducer";
 import AddBlog from "./components/AddBlog";
 import Login from "./components/Login";
 import Togglable from "./components/Togglable";
@@ -18,6 +20,7 @@ import UserBlogs from "./components/UserBlogs";
 const App = () => {
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs.blogs || []);
+  const blog = useSelector((state) => state.blogs.blog || []);
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -31,6 +34,13 @@ const App = () => {
       dispatch(userBlogsList(user.id));
     }
   }, [dispatch, user]);
+
+  useEffect(() => {
+    if (blog && blog.id) {
+      console.log(`Fetching blogs for user ID: ${blog.id}`);
+      dispatch(blogInfo(blog.id));
+    }
+  }, [dispatch, blog]);
   useEffect(() => {
     const storedUser = userStorage.loadUser();
     if (storedUser) {
@@ -82,7 +92,6 @@ const App = () => {
           path="/"
           element={
             <Layout user={user} handleLogout={handleLogout}>
-              <h2>Blogs</h2>
               <Notification />
               <Togglable buttonLabel="create new blog" ref={blogFormRef}>
                 <AddBlog
@@ -93,7 +102,7 @@ const App = () => {
                 .slice()
                 .sort(byLikes)
                 .map((blog) => (
-                  <Blog key={blog.id} blog={blog} />
+                  <Blogs key={blog.id} blog={blog} />
                 ))}
             </Layout>
           }
@@ -111,6 +120,15 @@ const App = () => {
           element={
             <Layout user={user} handleLogout={handleLogout}>
               <UserBlogs user={user} />
+            </Layout>
+          }
+        />
+        <Route
+          path="/blogs/:id"
+          element={
+            <Layout user={user} handleLogout={handleLogout}>
+              <Notification />
+              <Blog />
             </Layout>
           }
         />

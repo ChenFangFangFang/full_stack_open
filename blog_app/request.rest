@@ -1,5 +1,5 @@
 ###
-GET http://localhost:3001/api/blog
+GET http://localhost:3001/api/blog/6749cbdd2fc8a556b09d9322
 # content-type: application/json
 # Authorization: Bearer 
 ###
@@ -82,4 +82,22 @@ content-type: application/json
 {
     "username": "user",
     "password": "123456"
+}
+
+###
+POST http://localhost:3001/api/comments
+Content-Type: application/json
+
+{
+  "content": "usercomment adding",
+  "blog": "6749cbdd2fc8a556b09d9322"
+}
+
+###
+PUT http://localhost:3001/api/comments/674f58f88d9aec3c80689d2f
+Content-Type: application/json
+
+{
+  "content": "Updated comment content",
+  "blogId": "6749cbdd2fc8a556b09d9322"
 }

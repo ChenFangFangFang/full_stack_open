@@ -1,21 +1,39 @@
 import { Link } from "react-router-dom";
 
 const Layout = ({ children, user, handleLogout }) => {
-  const padding = { padding: 5 };
+  const navStyle = {
+    display: "flex",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    padding: "10px",
+    borderBottom: "1px solid #ccc"
+  };
+  const linkStyle = {
+    padding: "5px 10px",
+    textDecoration: "none",
+    color: "blue"
+  };
+  const userInfoStyle = {
+    marginLeft: "auto",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px"
+  };
 
   return (
     <div>
-      <div>
-        <Link style={padding} to="/">
+      <div style={navStyle}>
+        <Link style={linkStyle} to="/">
           Home
         </Link>
-        <Link style={padding} to="/users">
+        <Link style={linkStyle} to="/users">
           Users
         </Link>
+        <div style={userInfoStyle}></div>
+        {user && <div>{user.name} logged in</div>}
+        <button onClick={handleLogout}>Logout</button>
       </div>
       <h1>Blogs</h1>
-      <div>{user && <div>{user.name} logged in</div>}</div>
-      <button onClick={handleLogout}>Logout</button>
       <div>{children}</div> {/* Render page-specific content here */}
     </div>
   );

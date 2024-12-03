@@ -3,7 +3,8 @@ import blogs from "../services/blogs";
 import { showNotification } from "./notificationReducer";
 const initialState = {
   blogs: [], // Ensure this is an empty array
-  form: { title: "", author: "", url: "" } // Default form state
+  form: { title: "", author: "", url: "" }, // Default form state
+  blog: {}
 };
 
 const blogSlice = createSlice({
@@ -18,6 +19,7 @@ const blogSlice = createSlice({
       state.blogs = state.blogs.map((blog) =>
         blog.id === updated.id ? updated : blog
       );
+      state.blog[updated.id] = updated; // with this, the added like is visible
     },
     appendBlog(state, action) {
       state.blogs.push(action.payload);
@@ -34,6 +36,10 @@ const blogSlice = createSlice({
     },
     resetForm(state) {
       state.form = { title: "", author: "", url: "" };
+    },
+    setSingleBlog(state, action) {
+      const { blogId, blog } = action.payload;
+      state.blog[blogId] = blog;
     }
   }
 });
@@ -44,7 +50,8 @@ export const {
   setBlog,
   removeBlog,
   updateFormField,
-  resetForm
+  resetForm,
+  setSingleBlog
 } = blogSlice.actions;
 export const initializeBlogs = () => {
   return async (dispatch) => {
@@ -64,6 +71,25 @@ export const initializeBlogs = () => {
     }
   };
 };
+export const fetchBlogById = (id) => async (dispatch) => {
+  try {
+    const blog = await blogs.getBlogById(id); // Assume this fetches a user by ID
+    if (blog) dispatch(setSingleBlog({ blogId: id, blog }));
+  } catch (error) {
+    console.error(`Failed to fetch blog with ID ${id}:`, error);
+  }
+};
+export const blogInfo = (blogId) => {
+  return async (dispatch) => {
+    try {
+      const fetchedBlogs = await blogs.getBlogById(blogId); // Assume this function fetches the list of all users
+      dispatch(setSingleBlog({ blogId, fetchedBlogs }));
+    } catch (error) {
+      console.error(`Failed to fetch blogs for user ${blogId}:`, error);
+    }
+  };
+};
+
 export const addBlog = () => {
   return async (dispatch, getState) => {
     try {
@@ -121,6 +147,7 @@ export const likeBlog = (blog) => {
           5000
         )
       );
+      console.log(`Notification dispatched for blog: ${blog.title}`);
     } catch (error) {
       dispatch(
         showNotification(
