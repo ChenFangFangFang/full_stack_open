@@ -3,6 +3,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { likeBlog } from "../reducers/blogListReducer";
 import { useParams } from "react-router-dom";
 import { fetchBlogById } from "../reducers/blogListReducer";
+import Togglable from "./Togglable";
+import { addComment } from "../reducers/commentReducer";
+
+const CommentInput = ({ onSubmit }) => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const comment = event.target.comment.value;
+    onSubmit(comment);
+    event.target.comment.value = "";
+  };
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="comment" type="text" placeholder="Write a comment" />
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
 const Blog = () => {
   const { id } = useParams();
   console.log("Blog ID from URL:", id);
@@ -11,7 +28,6 @@ const Blog = () => {
   const blog = useSelector((state) => state.blogs.blog[id]);
 
   console.log("Blog from Redux:", blog);
-  //const nameOfUser = blog.user && blog.user.name ? blog.user.name : "anonymous";
 
   const handleLike = () => {
     dispatch(likeBlog(blog)); // Dispatch likeBlog action to Redux
@@ -24,6 +40,9 @@ const Blog = () => {
   if (!blog) {
     return null;
   }
+  const handleCommentSubmit = (comment) => {
+    dispatch(addComment({ content: comment, blogId: id })); // Dispatch the addComment action
+  };
 
   return (
     <div>
@@ -44,6 +63,15 @@ const Blog = () => {
         </div>
         <div>Added by {blog.user.name}</div>
       </div>
+      <h3>Comments</h3>
+      <Togglable buttonLabel="Add a comment">
+        <CommentInput onSubmit={handleCommentSubmit} />
+      </Togglable>
+      {blog.comments.map((comment) => (
+        <ul key={comment.id}>
+          <li>{comment.content}</li>
+        </ul>
+      ))}
     </div>
   );
 };
