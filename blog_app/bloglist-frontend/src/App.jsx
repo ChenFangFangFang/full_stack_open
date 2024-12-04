@@ -76,9 +76,6 @@ const App = () => {
   if (!user) {
     return (
       <div>
-        <Typography variant="h4" gutterBottom>
-          Blog Application
-        </Typography>
         <Notification />
         <Login login={handleLogin} />
       </div>
@@ -90,7 +87,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route
-          path="/"
+          path="/home"
           element={
             <Layout user={user} handleLogout={handleLogout}>
               <Notification />

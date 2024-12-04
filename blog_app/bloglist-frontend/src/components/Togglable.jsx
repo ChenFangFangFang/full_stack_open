@@ -1,4 +1,6 @@
 import { useState, forwardRef, useImperativeHandle } from "react";
+import Button from "@mui/material/Button";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Togglable = forwardRef((props, ref) => {
   const [visible, setVisible] = useState(false);
@@ -16,11 +18,27 @@ const Togglable = forwardRef((props, ref) => {
   return (
     <div>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+        <Button
+          variant="outlined"
+          onClick={toggleVisibility}
+          sx={{ my: 2, display: "block" }}
+        >
+          {props.buttonLabel}
+        </Button>
+
+        {/* <button onClick={toggleVisibility}>{props.buttonLabel}</button> */}
       </div>
       <div style={showWhenVisible}>
         {props.children}
-        <button onClick={toggleVisibility}>Cancel</button>
+        {/* <button onClick={toggleVisibility}>Cancel</button> */}
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={toggleVisibility}
+          startIcon={<DeleteIcon />}
+        >
+          Cancel
+        </Button>
       </div>
     </div>
   );

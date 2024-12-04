@@ -1,4 +1,5 @@
 import React from "react";
+import Button from "@mui/material/Button";
 import { useSelector, useDispatch } from "react-redux";
 import { addBlog, updateFormField } from "../reducers/blogListReducer";
 const AddBlog = ({ onBlogCreated }) => {
@@ -19,7 +20,7 @@ const AddBlog = ({ onBlogCreated }) => {
   };
 
   return (
-    <div className="addBlog">
+    <div>
       <h2>Add a new blog</h2>
       <form onSubmit={handleSubmit}>
         <div>
