@@ -4,18 +4,33 @@ import { likeBlog } from "../reducers/blogListReducer";
 import { useParams } from "react-router-dom";
 import { fetchBlogById } from "../reducers/blogListReducer";
 import Togglable from "./Togglable";
-import { addComment } from "../reducers/commentReducer";
+import { addComment, setContent } from "../reducers/commentReducer";
 
-const CommentInput = ({ onSubmit }) => {
+const CommentInput = () => {
+  const dispatch = useDispatch();
+  const content = useSelector((state) => state.comment.content);
+
+  console.log("Form from Redux:", content); // This should log the form state
+  const handleChange = (event) => {
+    dispatch(setContent(event.target.value)); // Update Redux state with input value
+  };
+  const { id } = useParams();
   const handleSubmit = (event) => {
     event.preventDefault();
-    const comment = event.target.comment.value;
-    onSubmit(comment);
-    event.target.comment.value = "";
+    console.log("Submitting comment:", content); // Log content to confirm
+
+    dispatch(addComment(id));
+    dispatch(setContent(""));
   };
   return (
     <form onSubmit={handleSubmit}>
-      <input name="comment" type="text" placeholder="Write a comment" />
+      <input
+        name="comment"
+        type="text"
+        placeholder="Write a comment"
+        value={content}
+        onChange={handleChange}
+      />
       <button type="submit">Submit</button>
     </form>
   );
@@ -40,9 +55,6 @@ const Blog = () => {
   if (!blog) {
     return null;
   }
-  const handleCommentSubmit = (comment) => {
-    dispatch(addComment({ content: comment, blogId: id })); // Dispatch the addComment action
-  };
 
   return (
     <div>
@@ -65,9 +77,9 @@ const Blog = () => {
       </div>
       <h3>Comments</h3>
       <Togglable buttonLabel="Add a comment">
-        <CommentInput onSubmit={handleCommentSubmit} />
+        <CommentInput />
       </Togglable>
-      {blog.comments.map((comment) => (
+      {(blog.comments || []).map((comment) => (
         <ul key={comment.id}>
           <li>{comment.content}</li>
         </ul>

@@ -1,25 +1,38 @@
 import { createSlice } from "@reduxjs/toolkit";
 import comments from "../services/comments";
 import { showNotification } from "./notificationReducer";
+
 const commentSlice = createSlice({
   name: "comment",
   initialState: {
+    content: "",
     comments: []
   },
   reducers: {
+    setContent(state, action) {
+      state.content = action.payload;
+    },
     setComment(state, action) {
       state.comments.push(action.payload);
     }
   }
 });
-export const { setComment } = commentSlice.actions;
+export const { setContent, setComment } = commentSlice.actions;
 
-export const addComment = (content) => {
-  return async (dispatch) => {
+export const addComment = (blogId) => {
+  return async (dispatch, getState) => {
+    const content = getState().comment.content; // Get the current content from Redux state
+    console.log("Adding comment:", { blogId, content }); // Log the payload
+
+    if (!content) {
+      console.log("Content is empty.");
+      return;
+    }
     try {
-      const newComment = await comments.create(content);
+      const newComment = await comments.create(blogId, { content });
 
       dispatch(setComment(newComment));
+      dispatch(setContent(""));
       dispatch(
         showNotification(
           { message: `You added: "${newComment.content}"`, type: "success" },
