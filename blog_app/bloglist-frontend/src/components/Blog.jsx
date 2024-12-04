@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { likeBlog } from "../reducers/blogListReducer";
 import { useParams } from "react-router-dom";
@@ -8,9 +8,12 @@ import { addComment, setContent } from "../reducers/commentReducer";
 
 const CommentInput = () => {
   const dispatch = useDispatch();
-  const content = useSelector((state) => state.comment.content);
-
+  const contentFromRedux = useSelector((state) => state.comment.content);
+  const [content, setLocalContent] = useState(contentFromRedux);
   console.log("Form from Redux:", content); // This should log the form state
+  useEffect(() => {
+    setLocalContent(contentFromRedux); // Sync local state with Redux state
+  }, [contentFromRedux]);
   const handleChange = (event) => {
     dispatch(setContent(event.target.value)); // Update Redux state with input value
   };

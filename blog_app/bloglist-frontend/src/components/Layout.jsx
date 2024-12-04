@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Typography from "@mui/material/Typography";
 
 const Layout = ({ children, user, handleLogout }) => {
   const navStyle = {
@@ -33,7 +34,9 @@ const Layout = ({ children, user, handleLogout }) => {
         {user && <div>{user.name} logged in</div>}
         <button onClick={handleLogout}>Logout</button>
       </div>
-      <h1>Blogs</h1>
+      <Typography variant="h5" gutterBottom>
+        Blog Application
+      </Typography>
       <div>{children}</div> {/* Render page-specific content here */}
     </div>
   );

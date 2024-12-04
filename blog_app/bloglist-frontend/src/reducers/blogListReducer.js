@@ -27,6 +27,12 @@ const blogSlice = createSlice({
     setBlog(state, action) {
       state.blogs = action.payload;
     },
+    updateBlogComments(state, action) {
+      const { blogId, newComment } = action.payload;
+      if (state.blog[blogId]) {
+        state.blog[blogId].comments.push(newComment);
+      }
+    },
     removeBlog(state, action) {
       state.blogs = state.blogs.filter((blog) => blog.id !== action.payload.id);
     },
@@ -48,6 +54,7 @@ export const {
   updateBlog,
   appendBlog,
   setBlog,
+  updateBlogComments,
   removeBlog,
   updateFormField,
   resetForm,

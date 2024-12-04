@@ -17,6 +17,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Users from "./components/Users";
 import Layout from "./components/Layout";
 import UserBlogs from "./components/UserBlogs";
+import Typography from "@mui/material/Typography";
+
 const App = () => {
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs.blogs || []);
@@ -74,16 +76,15 @@ const App = () => {
   if (!user) {
     return (
       <div>
-        <h2>Blogs</h2>
+        <Typography variant="h4" gutterBottom>
+          Blog Application
+        </Typography>
         <Notification />
         <Login login={handleLogin} />
       </div>
     );
   }
   const byLikes = (a, b) => b.likes - a.likes;
-  const padding = {
-    padding: 5
-  };
 
   return (
     <Router>

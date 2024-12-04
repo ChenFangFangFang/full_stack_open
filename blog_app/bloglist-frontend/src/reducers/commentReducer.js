@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import comments from "../services/comments";
 import { showNotification } from "./notificationReducer";
+import { updateBlogComments } from "./blogListReducer";
 
 const commentSlice = createSlice({
   name: "comment",
@@ -30,8 +31,8 @@ export const addComment = (blogId) => {
     }
     try {
       const newComment = await comments.create(blogId, { content });
-
       dispatch(setComment(newComment));
+      dispatch(updateBlogComments({ blogId, newComment }));
       dispatch(setContent(""));
       dispatch(
         showNotification(
