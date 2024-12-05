@@ -8,20 +8,16 @@ import { setNotification } from "./reducers/notificationReducer";
 import { initializeBlogs } from "./reducers/blogListReducer";
 import { userBlogsList } from "./reducers/allUsersReducer";
 import { blogInfo } from "./reducers/blogListReducer";
-import AddBlog from "./components/AddBlog";
 import Login from "./components/Login";
-import Togglable from "./components/Togglable";
 import userStorage from "./services/userStorage";
 import { setUser, clearUser } from "./reducers/userReducer";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Users from "./components/Users";
 import Layout from "./components/Layout";
 import UserBlogs from "./components/UserBlogs";
-import Typography from "@mui/material/Typography";
 
 const App = () => {
   const dispatch = useDispatch();
-  const blogs = useSelector((state) => state.blogs.blogs || []);
   const blog = useSelector((state) => state.blogs.blog || []);
   const user = useSelector((state) => state.user);
 
@@ -55,7 +51,6 @@ const App = () => {
       dispatch(setNotification(null));
     }, 5000);
   };
-  const blogFormRef = createRef();
   const handleLogin = async (credentials) => {
     try {
       const user = await loginService.login(credentials);
@@ -81,7 +76,6 @@ const App = () => {
       </div>
     );
   }
-  const byLikes = (a, b) => b.likes - a.likes;
 
   return (
     <Router>
@@ -91,17 +85,16 @@ const App = () => {
           element={
             <Layout user={user} handleLogout={handleLogout}>
               <Notification />
-              <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-                <AddBlog
-                  onBlogCreated={() => blogFormRef.current.toggleVisibility()}
-                />
-              </Togglable>
-              {blogs
-                .slice()
-                .sort(byLikes)
-                .map((blog) => (
-                  <Blogs key={blog.id} blog={blog} />
-                ))}
+              <Blogs />
+            </Layout>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <Layout user={user} handleLogout={handleLogout}>
+              <Notification />
+              <Blogs />
             </Layout>
           }
         />

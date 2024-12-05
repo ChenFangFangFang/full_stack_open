@@ -1,17 +1,57 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import { useState, useEffect, createRef, useId } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { initializeBlogs } from "../reducers/blogListReducer";
+import Togglable from "./Togglable";
+import AddBlog from "./AddBlog";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
 
-const Blogs = ({ blog }) => {
-  const style = {
-    border: "solid",
-    padding: 10,
-    borderWidth: 1,
-    marginBottom: 5
-  };
+const Blogs = () => {
+  const dispatch = useDispatch();
+  const blogs = useSelector((state) => state.blogs.blogs || []);
+  const blogFormRef = createRef();
+
+  useEffect(() => {
+    console.log("Dispatching initializeBlogs...");
+    dispatch(initializeBlogs());
+  }, [dispatch]);
+
+  const byLikes = (a, b) => b.likes - a.likes;
+
   return (
-    <div style={style} className="blog">
-      <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+    <div>
+      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+        <AddBlog onBlogCreated={() => blogFormRef.current.toggleVisibility()} />
+      </Togglable>
+      <div style={{ marginTop: "20px" }}>
+        <List>
+          {blogs
+            .slice()
+            .sort(byLikes)
+            .map((blog) => (
+              <React.Fragment key={blog.id}>
+                <ListItem
+                  disablePadding
+                  primary={blog.title}
+                  component={Link}
+                  to={`/blogs/${blog.id}`}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <ListItemButton>
+                    <ListItemText primary={blog.title} />
+                  </ListItemButton>
+                </ListItem>
+                <Divider />
+              </React.Fragment>
+            ))}
+        </List>
+      </div>
     </div>
   );
 };

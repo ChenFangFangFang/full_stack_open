@@ -63,12 +63,12 @@ const Blog = () => {
     <div>
       <h1>
         {blog.title}
-        {""} {blog.author}
+        {""} by {blog.author}
       </h1>
 
       <div>
         <div>
-          <a href={blog.url}>{blog.url}</a>
+          URL: <a href={blog.url}>{blog.url}</a>
         </div>
         <div>
           Likes: {blog.likes}

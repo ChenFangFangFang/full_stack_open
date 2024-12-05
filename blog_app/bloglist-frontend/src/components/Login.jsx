@@ -92,7 +92,7 @@ const Login = ({ login }) => {
               type="submit"
               value="Login"
               margin="normal"
-              sx={{ marginTop: 2, backgroundColor: "#1976d2" }}
+              sx={{ marginTop: 2 }}
             >
               Login
             </Button>
