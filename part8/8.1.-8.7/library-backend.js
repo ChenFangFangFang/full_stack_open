@@ -140,6 +140,11 @@ const resolvers = {
   },
   Mutation: {
     addBook: (root, args) => {
+      // 检查 title 是否已存在
+      if (books.find(book => book.title === args.title)) {
+        throw new Error('Book with this title already exists')
+      }
+      
       const book = { ...args, id: uuid() }
       books = books.concat(book)
       
