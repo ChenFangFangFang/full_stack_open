@@ -10,18 +10,27 @@ const User = require('./models/user')
 const resolvers = {
   Book: {
     author: async (root) => {
+      console.log('Fetching author for book:', root.title)
       return await Author.findById(root.author)
     }
   },
   Author: {
     bookCount: async (root) => {
-      return await Book.countDocuments({ author: root._id })
+      console.log('Getting bookCount for author:', root.name)
+      return root.bookCount || 0
     }
   },
   Query: {
-    bookCount: async () => await Book.countDocuments(),
-    authorCount: async () => await Author.countDocuments(),
+    bookCount: async () => {
+      console.log('Counting all books')
+      return await Book.countDocuments()
+    },
+    authorCount: async () => {
+      console.log('Counting all authors')
+      return await Author.countDocuments()
+    },
     allBooks: async (root, args) => {
+      console.log('Fetching books with args:', args)
       if (args.author) {
         const author = await Author.findOne({ name: args.author })
         if (!author) return []
@@ -40,7 +49,37 @@ const resolvers = {
     findBooksByGenre: async (root, args) => {
       return await Book.find({ genres: { $in: [args.genre] } }).populate('author')
     },
-    allAuthors: async () => await Author.find({}),
+    allAuthors: async () => {
+      console.log('Starting allAuthors query with aggregation')
+      console.time('allAuthors')
+      // 使用聚合管道一次性获取所有作者及其书籍数量
+      const authors = await Author.aggregate([
+        {
+          $lookup: {
+            from: 'books',
+            localField: '_id',
+            foreignField: 'author',
+            as: 'books'
+          }
+        },
+        {
+          $addFields: {
+            bookCount: { $size: '$books' }
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            born: 1,
+            bookCount: 1
+          }
+        }
+      ])
+      console.timeEnd('allAuthors')
+      console.log(`Fetched ${authors.length} authors in a single query`)
+      return authors
+    },
     me: async (root, args, context) => {
       return context.currentUser
     }
