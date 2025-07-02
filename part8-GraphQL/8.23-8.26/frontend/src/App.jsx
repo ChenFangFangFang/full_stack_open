@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Route, Routes, Link, Navigate } from "react-router-dom";
+import { useMutation, useSubscription } from '@apollo/client'
+
 import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
@@ -6,9 +8,36 @@ import Login from "./components/Login";
 import Notify from "./components/Notify";
 import Recommend from "./components/Recommend";
 import { useQuery } from "@apollo/client";
-import { ALL_AUTHORS,ALL_BOOKS } from "./queries";
+import { ALL_AUTHORS,ALL_BOOKS,BOOK_ADDED } from "./queries";
 import { useState, useEffect } from "react";
 import { useApolloClient } from "@apollo/client";
+
+const updateCache = (cache, addedBook) => {
+  const uniqByTitle = (a) => {
+    let seen = new Set()
+    return a.filter((item) => {
+      let k = item.title
+      return seen.has(k) ? false : seen.add(k)
+    })
+  }
+
+  try {
+    cache.updateQuery({ query: ALL_BOOKS }, (data) => {
+      console.log('Current cache data:', data)
+      if (!data) {
+        return { allBooks: [addedBook] }
+      }
+      const updatedBooks = uniqByTitle(data.allBooks.concat(addedBook))
+      console.log('Updated books:', updatedBooks)
+      return {
+        allBooks: updatedBooks
+      }
+    })
+  } catch (error) {
+    console.error('Error updating cache:', error)
+    console.log('Added book data:', addedBook)
+  }
+}
 
 const App = () => {
   const authors = useQuery(ALL_AUTHORS)
@@ -30,6 +59,25 @@ const App = () => {
       setErrorMessage(null)
     }, 5000)
   }
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data: { data: { bookAdded } } }) => {
+      try {
+        console.log('Subscription data received:', bookAdded)
+        if (!bookAdded || !bookAdded.title) {
+          console.error('Invalid book data received')
+          return
+        }
+        window.alert(`${bookAdded.title} added`)
+        updateCache(client.cache, bookAdded)
+      } catch (error) {
+        console.error('Error processing subscription data:', error)
+      }
+    },
+    onError: (error) => {
+      console.error('Subscription error:', error)
+      notify('Error in book subscription')
+    }
+  })
   
   const logout = () => {
     setToken(null)
