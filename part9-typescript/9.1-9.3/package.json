@@ -1,0 +1,22 @@
+{
+  "name": "exe1",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ts-node": "ts-node",
+    "calculateBmi": "ts-node bmiCalculator.ts",
+    "calculateBmi2": "ts-node bmiCalculator-2.ts",
+    "calculateExercises": "ts-node exerciseCalculator.ts",
+    "calculateExercises2": "ts-node exerciseCalculator-2.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
