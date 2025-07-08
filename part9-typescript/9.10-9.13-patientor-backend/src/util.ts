@@ -1,71 +1,45 @@
-import { Gender,NewPatientEntry} from "./types";
+import { Gender,NewPatientEntry } from "./types";
 import { z } from "zod";
-// const isString = (text: unknown): text is string => {
-//         return typeof text === 'string' || text instanceof String;
-//     };
-//   const isDate = (date: string): boolean => {
-//     return Boolean(Date.parse(date));
-//   };
-    // const isGender = (gender: string): gender is Gender => {
-    //     return Object.values(Gender).includes(gender as Gender);
-    // };
+import { Diagnosis,HealthCheckRating } from "./types";
 
+const BaseEntrySchema = z.object({
+    description: z.string().min(1),
+    date: z.string().refine((v) => Boolean(Date.parse(v)), {
+        message: "Invalid date format"
+    }),
+    specialist: z.string().min(1),
+    diagnosisCodes: z.array(z.string()).optional(),
+});
 
-// const parseName = (name: unknown): string => {
-//     if ( !name || !isString(name) ) {
-//         throw new Error('Incorrect or missing name');
-//     }
-//     return name;
-// };
-// const parseName = (name: unknown): string => {
-//     return z.string().parse(name);
-// };
-// const parseGender = (gender: unknown): Gender => {
-//     if ( !gender || !isString(gender) || !isGender(gender) ) {
-//         throw new Error('Incorrect or missing gender');
-//     }
-//     return gender;
-// };
+export const HealthCheckEntrySchema = BaseEntrySchema.extend({
+    type: z.literal("HealthCheck"),
+    healthCheckRating: z.nativeEnum(HealthCheckRating),
+});
 
-// const parseBirthDate = (date: unknown): string => {
-//     if ( !date || !isString(date) || !isDate(date) ) {
-//         throw new Error('Incorrect or missing date');
-//     }
-//     return date;
-// };
+// Hospital Entry Schema
+export const HospitalEntrySchema = BaseEntrySchema.extend({
+    type: z.literal("Hospital"),
+    discharge: z.object({
+        date: z.string().refine((v) => Boolean(Date.parse(v))),
+        criteria: z.string().min(1),
+    }),
+});
 
-// const parseSsn = (ssn: unknown): string => {
-//     if ( !ssn || !isString(ssn) ) {
-//         throw new Error('Incorrect or missing ssn');
-//     }
-//     return ssn;
-// };
+// OccupationalHealthcare Entry Schema
+export const OccupationalHealthcareEntrySchema = BaseEntrySchema.extend({
+    type: z.literal("OccupationalHealthcare"),
+    employerName: z.string().min(1),
+    sickLeave: z.object({
+        startDate: z.string().refine((v) => Boolean(Date.parse(v))),
+        endDate: z.string().refine((v) => Boolean(Date.parse(v))),
+    }).optional(),
+});
 
-// const parseOccupation = (occupation: unknown): string => {
-//     if ( !occupation || !isString(occupation) ) {
-//         throw new Error('Incorrect or missing occupation');
-//     }
-//     return occupation;
-// };
-
-// export const toNewPatient = (object: unknown): NewPatientEntry => {
-//     if ( !object || typeof object !== 'object' ) {
-//         throw new Error('Incorrect or missing data');
-//       }
-
-//     if ( 'name' in object && 'dateOfBirth' in object && 'ssn' in object && 'gender' in object && 'occupation' in object ) {
-//         const newPatient: NewPatientEntry = {
-//             name: z.string().parse(object.name),
-//             dateOfBirth: z.string().parse(object.dateOfBirth),
-//             ssn: z.string().parse(object.ssn),
-//             gender: z.nativeEnum(Gender).parse(object.gender),
-//             occupation: z.string().parse(object.occupation)
-//         };
-//         return newPatient;
-//     }
-//     throw new Error('Incorrect data: a field missing');
-// };
-  
+export const NewEntrySchema = z.discriminatedUnion("type", [
+    HealthCheckEntrySchema,
+    HospitalEntrySchema,
+    OccupationalHealthcareEntrySchema,
+]);
 export const NewPatientSchema = z.object({
     name: z.string(),
     dateOfBirth: z.string(),
@@ -76,3 +50,10 @@ export const NewPatientSchema = z.object({
 export const toNewPatientEntry = (object:unknown):NewPatientEntry => {
     return NewPatientSchema.parse(object);
 };
+export const parseDiagnosisCodes = (object: unknown): Array<Diagnosis['code']> =>  {
+    if (!object || typeof object !== 'object' || !('diagnosisCodes' in object)) {
+      // we will just trust the data to be in correct form
+      return [] as Array<Diagnosis['code']>;
+    }  
+    return object.diagnosisCodes as Array<Diagnosis['code']>;
+  };

@@ -1,0 +1,55 @@
+### Add a new HealthCheck entry to a patient
+POST http://localhost:3000/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+    "type": "HealthCheck",
+    "description": "Annual checkup",
+    "date": "2024-03-15",
+    "specialist": "Dr. House",
+    "healthCheckRating": 0,
+    "diagnosisCodes": ["Z57.1", "Z74.3"]
+}
+
+### Add a new Hospital entry to a patient
+POST http://localhost:3000/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+    "type": "Hospital",
+    "description": "Surgery for broken leg",
+    "date": "2024-03-10",
+    "specialist": "Dr. Smith",
+    "discharge": {
+        "date": "2024-03-12",
+        "criteria": "Patient can walk with crutches"
+    },
+    "diagnosisCodes": ["S82.4"]
+}
+
+### Add an invalid entry (missing required fields)
+POST http://localhost:3000/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+    "type": "HealthCheck",
+    "description": "Annual checkup"
+    // Missing required fields to test error handling
+}
+
+### Add an OccupationalHealthcare entry
+POST http://localhost:3000/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+    "type": "OccupationalHealthcare",
+    "description": "Workplace accident follow-up",
+    "date": "2024-03-14",
+    "specialist": "Dr. Wilson",
+    "employerName": "Tech Corp",
+    "sickLeave": {
+        "startDate": "2024-03-14",
+        "endDate": "2024-03-21"
+    },
+    "diagnosisCodes": ["H35.29"]
+}

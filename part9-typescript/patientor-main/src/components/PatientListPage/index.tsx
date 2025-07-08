@@ -71,7 +71,7 @@ const clickNameHandler = (name: string) => {
               <TableCell    sx={{
      cursor: 'pointer',
      '&:hover': {
-       backgroundColor: '#f5f5f5',  // 或其他你想要的颜色
+       backgroundColor: '#f5f5f5',  
        textDecoration: 'underline'
      }
    }} onClick={() => clickNameHandler(patient.id)} >{patient.name}</TableCell>
